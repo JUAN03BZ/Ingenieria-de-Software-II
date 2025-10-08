@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -44,5 +45,36 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    /**
+     * Get user role name
+     */
+    public function getRoleName()
+    {
+        return $this->role ? $this->role->name : 'Sin rol';
+    }
+
+    /**
+     * Check if user is an admin (alcalde or ordenador del gasto)
+     */
+    public function isAdmin()
+    {
+        return $this->hasAnyRole(['alcalde', 'ordenador_gasto']);
+    }
+
+    /**
+     * Check if user can approve payments
+     */
+    public function canApprovePayments()
+    {
+        return $this->hasAnyRole(['alcalde', 'ordenador_gasto', 'tesoreria']);
+    }
+
+    /**
+     * Check if user can manage contracts
+     */
+    public function canManageContracts()
+    {
+        return $this->hasAnyRole(['contratacion', 'alcalde']);
     }
 }

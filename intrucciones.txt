@@ -1,0 +1,9 @@
+1. crear proyecto nuevo local (carpeta)
+- composer global require laravel/installer
+- laravel new example-app
+
+2. despues clonar el repositorio en una carpeta aparte
+
+3. despues pegar el repositorio clonado en el proyecto local
+
+4. configurar xammp buscar linea (Config Apache), y abrir el PHP(php.ini) y eliminar el punto y coma de la linea "extension=zip" despues guardar

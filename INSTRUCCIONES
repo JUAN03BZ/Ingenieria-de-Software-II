@@ -1,8 +1,0 @@
-Instalar composer
-
-Instalar artisan
-
-Instalar Laravel
-
-- Migrar base de datos
-php artisan migrate
