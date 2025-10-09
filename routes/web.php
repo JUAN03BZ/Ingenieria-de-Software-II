@@ -5,6 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CrearUsuario;
 use App\Http\Controllers\NuevaCuenta;
 
+use App\Http\Controllers\ClienteController;
+
+Route::post('/clientes/guardar', [ClienteController::class, 'guardar'])->name('clientes.guardar');
+
+
 Route::get('/cuenta-cobro', [NuevaCuenta::class, 'crear'])->name('cuenta.cobro.crear');
 Route::post('/cuenta-cobro', [NuevaCuenta::class, 'guardar'])->name('cuenta.cobro.guardar');
 Route::get('/cuentas-cobro', [NuevaCuenta::class, 'index'])->name('cuenta.cobro.index');

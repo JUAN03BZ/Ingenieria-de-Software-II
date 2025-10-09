@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+    {{-- Encabezado con botón de retroceso --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Crear Cuenta de Cobro</h2>
         <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
@@ -9,11 +10,15 @@
         </button>
     </div>
 
+    {{-- Formulario --}}
     <form action="{{ route('cuenta.cobro.guardar') }}" method="POST">
         @csrf
 
+        {{-- Datos del cobrador --}}
+        <h5 class="mb-3">Datos de quien cobra</h5>
+
         <div class="mb-3">
-            <label for="nombre_cobrador" class="form-label">Nombre completo de quien cobra</label>
+            <label for="nombre_cobrador" class="form-label">Nombre completo</label>
             <input type="text" name="nombre_cobrador" id="nombre_cobrador" class="form-control" required>
         </div>
 
@@ -39,8 +44,11 @@
 
         <hr>
 
+        {{-- Datos del cliente --}}
+        <h5 class="mb-3">Datos del cliente</h5>
+
         <div class="mb-3">
-            <label for="nombre_cliente" class="form-label">Nombre / Razón social a quien cobra</label>
+            <label for="nombre_cliente" class="form-label">Nombre / Razón social</label>
             <input type="text" name="nombre_cliente" id="nombre_cliente" class="form-control" required>
         </div>
 
@@ -49,9 +57,12 @@
             <input type="text" name="documento_cliente" id="documento_cliente" class="form-control" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save me-1"></i> Crear Cuenta de Cobro
-        </button>
+        {{-- Botones --}}
+        <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i> Crear Cuenta de Cobro
+            </button>
+        </div>
     </form>
 </div>
 @endsection
