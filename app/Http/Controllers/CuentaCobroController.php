@@ -11,7 +11,7 @@ class CuentaCobroController extends Controller
     public function create()
     {
         // Muestra el formulario de creación
-        return view('crearcuenta.crear'); // Asegúrate de que tu vista se llame 'cuenta-cobro/create.blade.php'
+        return view('crearcuenta.crear'); 
     }
 
     public function store(Request $request)
@@ -43,7 +43,7 @@ class CuentaCobroController extends Controller
     public function index()
     {
         // Lista todas las cuentas del usuario logueado (o todas si eres admin)
-        $cuentas = CuentaCobro::where('user_id', Auth::id())->get(); // O CuentaCobro::all() si quieres todas
-        return view('cuenta-cobro.index', compact('cuentas')); // Crea esta vista si no la tienes
+        $cuentas = CuentaCobro::where('user_id', Auth::id())->get(); 
+        return view('cuenta-cobro.index', compact('cuentas')); 
     }
 }

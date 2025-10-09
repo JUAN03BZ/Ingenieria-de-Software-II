@@ -40,9 +40,6 @@ class NuevaCuenta extends Controller
             'forma_pago'         => 'required|string|max:50',
         ]);
 
-        // Más adelante aquí vas a guardar en la base de datos
-        // Ejemplo:
-        // CuentaCobro::create($request->all());
 
         return redirect()->route('dashboard')
                          ->with('success', 'Cuenta de cobro creada con éxito.');
