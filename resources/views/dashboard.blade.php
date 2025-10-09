@@ -3,9 +3,98 @@
 @section('title', 'Dashboard - CuentasCobro')
 
 @section('content')
-<!-- Navbar -->
+<style>
+    /* Sidebar con animación de plegado */
+    .sidebar {
+        background-color: #212529;
+        height: 100vh;
+        width: 220px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+    }
+
+    .sidebar.collapsed {
+        width: 70px !important;
+    }
+
+    .sidebar h6,
+    .sidebar .nav-link span {
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar.collapsed h6,
+    .sidebar.collapsed .nav-link span {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sidebar .nav-link {
+        color: #adb5bd;
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .sidebar .nav-link i {
+        min-width: 25px;
+        text-align: center;
+    }
+
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+
+    /* Botón para plegar */
+    .toggle-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.3rem;
+        margin-right: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .toggle-btn:hover {
+        color: #0d6efd;
+    }
+
+    /* Contenedor principal */
+    .main-wrapper {
+        margin-left: 220px;
+        transition: all 0.3s ease;
+    }
+
+    .main-wrapper.collapsed {
+        margin-left: 70px;
+    }
+
+    /*Ajuste navbar*/
+
+    .navbar {
+        z-index: 1050;
+        position: sticky;
+        top: 0;
+    }
+</style>
+
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
+        <!-- Botón para plegar el sidebar -->
+        <button class="toggle-btn" id="toggleSidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <a class="navbar-brand" href="{{ route('dashboard') }}">
             <i class="fas fa-file-invoice-dollar me-2"></i>CuentasCobro
         </a>
@@ -21,16 +110,8 @@
                         <i class="fas fa-user me-1"></i>{{ Auth::user()->name }}
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user-cog me-1"></i>Perfil
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-cog me-1"></i>Configuración
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-1"></i>Perfil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-1"></i>Configuración</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item" href="{{ route('logout') }}" 
@@ -45,164 +126,143 @@
     </div>
 </nav>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 p-0">
-            <div class="sidebar">
-                <div class="p-3">
-                    <h6 class="text-white-50 text-uppercase">Menú Principal</h6>
+<div class="sidebar" id="sidebar">
+    <div class="p-3">
+        <h6 class="text-white-50 text-uppercase">Menú Principal</h6>
+    </div>
+    <nav class="nav flex-column px-3">
+        <a class="nav-link active" href="{{ route('dashboard') }}">
+            <i class="fas fa-tachometer-alt me-2"></i><span>Dashboard</span>
+        </a>
+        <a class="nav-link" href="{{ route('cuenta.cobro.index') }}">
+            <i class="fas fa-file-invoice me-2"></i><span>Cuentas de Cobro</span>
+        </a>
+        <a class="nav-link" href="{{ route('cuenta.cobro.create') }}">
+            <i class="fas fa-plus-circle me-2"></i><span>Nueva Cuenta</span>
+        </a>
+        {{-- ELIMINADO: Enlace de Clientes para evitar error --}}
+        <a class="nav-link" href="#">
+            <i class="fas fa-chart-bar me-2"></i><span>Reportes</span>
+        </a>
+        <a class="nav-link" href="#">
+            <i class="fas fa-cog me-2"></i><span>Configuración</span>
+        </a>
+    </nav>
+</div>
+
+
+<div class="main-wrapper" id="mainWrapper">
+    <div class="container-fluid">
+        <div class="main-content p-4">
+  
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="h3 text-dark">¡Bienvenido, {{ Auth::user()->name }}!</h1>
+                    <p class="text-muted">Gestiona tus cuentas de cobro de manera eficiente</p>
                 </div>
-                <nav class="nav flex-column px-3">
-                    <a class="nav-link active" href="{{ route('dashboard') }}">
-                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-file-invoice me-2"></i>Cuentas de Cobro
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-plus-circle me-2"></i>Nueva Cuenta
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-users me-2"></i>Clientes
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-chart-bar me-2"></i>Reportes
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-cog me-2"></i>Configuración
-                    </a>
-                </nav>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="col-md-9 col-lg-10">
-            <div class="main-content p-4">
-                <!-- Welcome Section -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h1 class="h3 text-dark">¡Bienvenido, {{ Auth::user()->name }}!</h1>
-                        <p class="text-muted">Gestiona tus cuentas de cobro de manera eficiente</p>
+            {{-- Mostrar mensaje de éxito si existe (ej. después de crear una cuenta) --}}
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            
+            <div class="row mb-4 justify-content-center">
+                <div class="col-md-2 mb-3">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="text-primary mb-2"><i class="fas fa-file-invoice fa-2x"></i></div>
+                        <h5 class="card-title">Total Cuentas</h5>
+                        <h3 class="text-primary">{{ $totalCuentas ?? 0 }}</h3>
+                        <small class="text-muted">Cuentas registradas</small>
                     </div>
                 </div>
 
-                <!-- Statistics Cards -->
-                <div class="row mb-4">
-                    <div class="col-md-3 mb-3">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <div class="text-primary mb-2">
-                                    <i class="fas fa-file-invoice fa-2x"></i>
-                                </div>
-                                <h5 class="card-title">Total Cuentas</h5>
-                                <h3 class="text-primary">0</h3>
-                                <small class="text-muted">Cuentas registradas</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-3 mb-3">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <div class="text-success mb-2">
-                                    <i class="fas fa-check-circle fa-2x"></i>
-                                </div>
-                                <h5 class="card-title">Pagadas</h5>
-                                <h3 class="text-success">0</h3>
-                                <small class="text-muted">Cuentas pagadas</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-3 mb-3">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <div class="text-warning mb-2">
-                                    <i class="fas fa-clock fa-2x"></i>
-                                </div>
-                                <h5 class="card-title">Pendientes</h5>
-                                <h3 class="text-warning">0</h3>
-                                <small class="text-muted">Por cobrar</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-3 mb-3">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <div class="text-info mb-2">
-                                    <i class="fas fa-dollar-sign fa-2x"></i>
-                                </div>
-                                <h5 class="card-title">Total Facturado</h5>
-                                <h3 class="text-info">$0</h3>
-                                <small class="text-muted">Este mes</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Quick Actions -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-white">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-rocket me-2"></i>Acciones Rápidas
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <a href="cuenta-cobro" class="btn btn-primary btn-lg w-100">
-                                            <i class="fas fa-plus-circle me-2"></i>
-                                            Nueva Cuenta de Cobro
-                                        </a>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <a href="register" class="btn btn-outline-primary btn-lg w-100">
-                                            <i class="fas fa-user-plus me-2"></i>
-                                            Agregar Cliente
-                                        </a>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <a href="#" class="btn btn-outline-primary btn-lg w-100">
-                                            <i class="fas fa-chart-line me-2"></i>
-                                            Ver Reportes
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-md-2 mb-3">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="text-success mb-2"><i class="fas fa-check-circle fa-2x"></i></div>
+                        <h5 class="card-title">Pagadas</h5>
+                        <h3 class="text-success">{{ $pagadas ?? 0 }}</h3>
+                        <small class="text-muted">Cuentas pagadas</small>
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header bg-white">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-history me-2"></i>Actividad Reciente
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="text-center py-4">
-                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                    <p class="text-muted">No hay actividad reciente para mostrar.</p>
-                                    <p class="text-muted">¡Comienza creando tu primera cuenta de cobro!</p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-md-2 mb-3">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="text-warning mb-2"><i class="fas fa-clock fa-2x"></i></div>
+                        <h5 class="card-title">Pendientes</h5>
+                        <h3 class="text-warning">{{ $pendientes ?? 0 }}</h3>
+                        <small class="text-muted">Por cobrar</small>
                     </div>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="text-info mb-2"><i class="fas fa-dollar-sign fa-2x"></i></div>
+                        <h5 class="card-title">Total Facturado</h5>
+                        <h3 class="text-info">${{ number_format($totalFacturado ?? 0, 2) }}</h3>
+                        <small class="text-muted">Este mes</small>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-rocket me-2"></i>Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3"> {{-- CAMBIADO: Columna más ancha para solo 2 botones --}}
+                            <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-plus-circle me-2"></i>Nueva Cuenta de Cobro
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3"> {{-- CAMBIADO: Solo "Ver Reportes", eliminé "Agregar Cliente" --}}
+                            <a href="{{ route('cuenta.cobro.index') }}" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="fas fa-chart-line me-2"></i>Ver Reportes
+                            </a>
+                        </div>
+                        {{-- ELIMINADO: Botón de "Agregar Cliente" para evitar error --}}
+                    </div>
+                </div>
+            </div>
+
+           
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Actividad Reciente</h5>
+                </div>
+                <div class="card-body text-center py-4">
+                    @if($totalCuentas ?? 0 > 0)
+                        <p class="text-muted">Tienes {{ $totalCuentas ?? 0 }} cuenta(s) registrada(s). Revisa la sección de <a href="{{ route('cuenta.cobro.index') }}">Cuentas de Cobro</a> para más detalles.</p>
+                    @else
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No hay actividad reciente para mostrar.</p>
+                        <p class="text-muted">¡Comienza creando tu primera cuenta de cobro!</p>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Logout Form -->
+
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
     @csrf
 </form>
+
+<script>
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const mainWrapper = document.getElementById('mainWrapper');
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        mainWrapper.classList.toggle('collapsed');
+    });
+</script>
 @endsection

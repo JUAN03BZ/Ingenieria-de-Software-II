@@ -3,91 +3,134 @@
 @section('title', 'Iniciar Sesión - CuentasCobro')
 
 @section('content')
-<div class="login-container d-flex align-items-center justify-content-center">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="login-card p-4">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-file-invoice-dollar fa-3x text-primary mb-3"></i>
-                        <h3 class="fw-bold text-dark">CuentasCobro</h3>
-                        <p class="text-muted">Inicia sesión en tu cuenta</p>
-                    </div>
+<style>
+    body {
+        background: linear-gradient(135deg, #0d47a1, #1b5e20);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Poppins', sans-serif;
+    }
 
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+    .login-box {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 40px 30px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 380px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+        text-align: center;
+        color: #fff;
+        position: relative;
+    }
 
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">
-                                <i class="fas fa-envelope me-1"></i>Correo electrónico
-                            </label>
-                            <input type="email" 
-                                   class="form-control @error('email') is-invalid @enderror" 
-                                   id="email" 
-                                   name="email" 
-                                   value="{{ old('email') }}" 
-                                   required 
-                                   autocomplete="email" 
-                                   autofocus
-                                   placeholder="Ingresa tu correo">
-                            @error('email')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
+    .login-box .avatar {
+        background: #19b961ff;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        position: absolute;
+        top: -45px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">
-                                <i class="fas fa-lock me-1"></i>Contraseña
-                            </label>
-                            <input type="password" 
-                                   class="form-control @error('password') is-invalid @enderror" 
-                                   id="password" 
-                                   name="password" 
-                                   required 
-                                   autocomplete="current-password"
-                                   placeholder="Ingresa tu contraseña">
-                            @error('password')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
+    .login-box .avatar i {
+        font-size: 45px;
+        color: #fff;
+    }
 
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                            <label class="form-check-label" for="remember">
-                                Recordarme
-                            </label>
-                        </div>
+    .login-box input.form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-bottom: 2px solid #4caf50;
+        border-radius: 0;
+        color: #fff;
+        margin-bottom: 20px;
+    }
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
-                            </button>
-                        </div>
-                    </form>
+    .login-box input.form-control::placeholder {
+        color: #ccc;
+    }
 
-                    <div class="text-center mt-4">
-                        <small class="text-muted">
-                            ¿No tienes una cuenta? 
-                            <a href="#" class="text-decoration-none">Regístrate aquí</a>
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
+    .login-box input:focus {
+        box-shadow: none;
+        border-color: #81c784;
+    }
+
+    .login-box .form-check-label {
+        color: #ccc;
+        font-size: 0.9rem;
+    }
+
+    .login-box .forgot-password {
+        float: right;
+        color: #81c784;
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+
+    .login-box button {
+        background-color: #2e7d32;
+        border: none;
+        width: 100%;
+        padding: 10px;
+        color: #fff;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .login-box button:hover {
+        background-color: #388e3c;
+    }
+</style>
+
+<div class="login-box">
+    <div class="avatar">
+        <i class="fas fa-user"></i>
     </div>
+
+    <form method="POST" action="{{ route('login') }}">
+        @csrf
+        <div class="mt-5">
+            <div class="mb-3 text-start">
+                <input type="email" 
+                       class="form-control @error('email') is-invalid @enderror"
+                       id="email" name="email"
+                       placeholder="Username" 
+                       value="{{ old('email') }}"
+                       required autofocus>
+                @error('email')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3 text-start">
+                <input type="password"
+                       class="form-control @error('password') is-invalid @enderror"
+                       id="password" name="password"
+                       placeholder="**********"
+                       required>
+                @error('password')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                    <label class="form-check-label" for="remember">Recuerdame</label>
+                </div>
+                <a href="#" class="forgot-password">Crear Cuenta</a>
+            </div>
+
+            <button type="submit">Ingresar</button>
+        </div>
+    </form>
 </div>
 @endsection

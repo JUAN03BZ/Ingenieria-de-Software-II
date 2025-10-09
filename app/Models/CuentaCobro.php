@@ -12,13 +12,17 @@ class CuentaCobro extends Model
     protected $table = 'cuentas_cobro';
 
     protected $fillable = [
-        'concepto_cobro',
-        'periodo',
-        'valor_cobro',
-        'valor_bruto',
-        'retencion_fuente',
-        'otros_descuentos',
-        'total_pagar',
-        'forma_pago',
+        'nombre_cobrador',
+        'documento_cobrador',
+        'direccion_cobrador',
+        'telefono_cobrador',
+        'email_cobrador',
+        'nombre_cliente',
+        'documento_cliente',
+        'monto',
+        'descripcion',
+        'fecha_emision',
+        'user_id',
+        'estado',
     ];
 }
