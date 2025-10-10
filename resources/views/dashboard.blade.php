@@ -140,7 +140,6 @@
         <a class="nav-link" href="{{ route('cuenta.cobro.create') }}">
             <i class="fas fa-plus-circle me-2"></i><span>Nueva Cuenta</span>
         </a>
-        {{-- ELIMINADO: Enlace de Clientes para evitar error --}}
         <a class="nav-link" href="#">
             <i class="fas fa-chart-bar me-2"></i><span>Reportes</span>
         </a>
@@ -162,7 +161,7 @@
                 </div>
             </div>
 
-            {{-- Mostrar mensaje de éxito si existe (ej. después de crear una cuenta) --}}
+            {{-- Mostrar mensaje de éxito si existe --}}
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -171,43 +170,64 @@
             @endif
 
             
-            <div class="row mb-4 justify-content-center">
-                <div class="col-md-2 mb-3">
-                    <div class="card border-0 shadow-sm h-100 text-center">
-                        <div class="text-primary mb-2"><i class="fas fa-file-invoice fa-2x"></i></div>
-                        <h5 class="card-title">Total Cuentas</h5>
-                        <h3 class="text-primary">{{ $totalCuentas ?? 0 }}</h3>
-                        <small class="text-muted">Cuentas registradas</small>
-                    </div>
-                </div>
-
-                <div class="col-md-2 mb-3">
-                    <div class="card border-0 shadow-sm h-100 text-center">
-                        <div class="text-success mb-2"><i class="fas fa-check-circle fa-2x"></i></div>
-                        <h5 class="card-title">Pagadas</h5>
-                        <h3 class="text-success">{{ $pagadas ?? 0 }}</h3>
-                        <small class="text-muted">Cuentas pagadas</small>
-                    </div>
-                </div>
-
-                <div class="col-md-2 mb-3">
-                    <div class="card border-0 shadow-sm h-100 text-center">
-                        <div class="text-warning mb-2"><i class="fas fa-clock fa-2x"></i></div>
-                        <h5 class="card-title">Pendientes</h5>
-                        <h3 class="text-warning">{{ $pendientes ?? 0 }}</h3>
-                        <small class="text-muted">Por cobrar</small>
-                    </div>
-                </div>
-
-                <div class="col-md-2 mb-3">
-                    <div class="card border-0 shadow-sm h-100 text-center">
-                        <div class="text-info mb-2"><i class="fas fa-dollar-sign fa-2x"></i></div>
-                        <h5 class="card-title">Total Facturado</h5>
-                        <h3 class="text-info">${{ number_format($totalFacturado ?? 0, 2) }}</h3>
-                        <small class="text-muted">Este mes</small>
+            <!-- Panel de métricas -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-10">
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100 text-center py-4 px-3" style="min-height: 180px;">
+                                <div class="d-flex justify-content-center align-items-center mb-3" style="height:56px;">
+                                    <span class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                                        <i class="fas fa-file-invoice fa-2x text-primary"></i>
+                                    </span>
+                                </div>
+                                <h5 class="card-title">Total Cuentas</h5>
+                                <h3 class="text-primary">{{ $totalCuentas ?? 0 }}</h3>
+                                <small class="text-muted">Cuentas registradas</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100 text-center py-4 px-3" style="min-height: 180px;">
+                                <div class="d-flex justify-content-center align-items-center mb-3" style="height:56px;">
+                                    <span class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                                    </span>
+                                </div>
+                                <h5 class="card-title">Pagadas</h5>
+                                <h3 class="text-success">{{ $pagadas ?? 0 }}</h3>
+                                <small class="text-muted">Cuentas pagadas</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100 text-center py-4 px-3" style="min-height: 180px;">
+                                <div class="d-flex justify-content-center align-items-center mb-3" style="height:56px;">
+                                    <span class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                                        <i class="fas fa-clock fa-2x text-warning"></i>
+                                    </span>
+                                </div>
+                                <h5 class="card-title">Pendientes</h5>
+                                <h3 class="text-warning">{{ $pendientes ?? 0 }}</h3>
+                                <small class="text-muted">Por cobrar</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 shadow-sm h-100 text-center py-4 px-3" style="min-height: 180px;">
+                                <div class="d-flex justify-content-center align-items-center mb-3" style="height:56px;">
+                                    <span class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width:56px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                                        <i class="fas fa-dollar-sign fa-2x text-info"></i>
+                                    </span>
+                                </div>
+                                <h5 class="card-title">Total Facturado</h5>
+                                <h3 class="text-info">${{ number_format($totalFacturado ?? 0, 2) }}</h3>
+                                <small class="text-muted">Este mes</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- 👇 Separador agregado para evitar que choquen los bloques -->
+            <div style="margin-bottom: 40px;"></div>
 
             
             <div class="card border-0 shadow-sm mb-4">
@@ -216,17 +236,16 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3"> {{-- CAMBIADO: Columna más ancha para solo 2 botones --}}
+                        <div class="col-md-6 mb-3">
                             <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary btn-lg w-100">
                                 <i class="fas fa-plus-circle me-2"></i>Nueva Cuenta de Cobro
                             </a>
                         </div>
-                        <div class="col-md-6 mb-3"> {{-- CAMBIADO: Solo "Ver Reportes", eliminé "Agregar Cliente" --}}
+                        <div class="col-md-6 mb-3">
                             <a href="{{ route('cuenta.cobro.index') }}" class="btn btn-outline-primary btn-lg w-100">
                                 <i class="fas fa-chart-line me-2"></i>Ver Reportes
                             </a>
                         </div>
-                        {{-- ELIMINADO: Botón de "Agregar Cliente" para evitar error --}}
                     </div>
                 </div>
             </div>
