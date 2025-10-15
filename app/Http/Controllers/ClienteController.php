@@ -7,11 +7,12 @@ use Illuminate\Support\Facades\Auth;
 
 class ClienteController extends Controller
 {
+
     // Método para listar clientes (mínimo: devuelve una vista vacía por ahora)
     public function index()
     {
         // Temporal: Si no tienes modelo, solo muestra un mensaje
-        // Después, usa: $clientes = Cliente::all(); return view('clientes.index', compact('clientes'));
+        // Después, usa: $clientes = Cliente::all()s; return view('clientes.index', compact('clientes'));
         return view('clientes.index'); // Crea esta vista si no existe (ver Paso 4)
     }
 
