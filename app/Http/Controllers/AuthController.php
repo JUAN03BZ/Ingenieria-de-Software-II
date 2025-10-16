@@ -38,7 +38,20 @@ class AuthController extends Controller
     // Mostrar dashboard/menú principal
     public function dashboard()
     {
-        return view('dashboard');
+        $user = Auth::user();
+        // Obtener todas las cuentas de cobro del usuario
+        $cuentas = \App\Models\CuentaCobro::where('user_id', $user->id)->get();
+
+        $totalCuentas = $cuentas->count();
+        $pagadas = $cuentas->where('estado', 'pagada')->count();
+        $pendientes = $cuentas->where('estado', 'pendiente')->count();
+        // Total facturado este mes
+        $totalFacturado = $cuentas->where('estado', 'pagada')
+            ->where('fecha_emision', '>=', now()->startOfMonth())
+            ->sum('monto');
+
+    $actividadesRecientes = $cuentas->sortByDesc('created_at')->take(5);
+    return view('dashboard', compact('totalCuentas', 'pagadas', 'pendientes', 'totalFacturado', 'actividadesRecientes'));
     }
 
     // Procesar logout

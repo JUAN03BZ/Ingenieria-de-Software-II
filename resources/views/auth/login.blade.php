@@ -190,7 +190,7 @@
         <div class="form-check mb-3 text-start">
             <input class="form-check-input" type="checkbox" name="remember" id="remember">
             <label class="form-check-label" for="remember">Recordarme</label>
-            <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+            <a href="{{ route('register') }}" class="forgot-password">Crear usuario</a>
         </div>
 
         <button type="submit">Ingresar</button>

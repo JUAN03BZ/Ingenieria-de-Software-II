@@ -28,8 +28,7 @@ class CrearUsuario extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Auth::login($user);
-
-        return redirect()->route('dashboard');
+    // No iniciar sesión automáticamente, solo mostrar agradecimiento
+    return view('registro.gracias');
     }
 }

@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CrearUsuario;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CuentaCobroController;
-use App\Http\Controllers\RolControler;
+use App\Http\Controllers\RolController;
 
 // Ruta raíz redirige al login
 Route::get('/', function () {
@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     // ====================
     // 🧩 Rutas de Roles
     // ====================
-    Route::resource('roles', RolControler::class)->except(['show'])->names([
+        Route::resource('roles', RolController::class)->except(['show'])->names([
         'index' => 'roles.index',
         'create' => 'roles.create',
         'store' => 'roles.store',
@@ -60,30 +60,25 @@ Route::middleware(['auth'])->group(function () {
     ]);
 
     // Ruta personalizada para mostrar un rol específico
-    Route::get('/roles/{role}', [RolControler::class, 'show'])->name('roles.show');
+        Route::get('/roles/{role}', [RolController::class, 'show'])->name('roles.show');
 
     // ====================
     // ⚙️ Rutas adicionales de Roles
     // ====================
     Route::prefix('roles')->name('roles.')->group(function () {
-        Route::post('/assign-role', [RolControler::class, 'assignRole'])->name('assign');
-        Route::post('/remove-role', [RolControler::class, 'removeRole'])->name('remove');
-        Route::get('/users-without-role', [RolControler::class, 'getUsersWithoutRole'])->name('users.without.role');
+            Route::post('/assign-role', [RolController::class, 'assignRole'])->name('assign');
+            Route::post('/remove-role', [RolController::class, 'removeRole'])->name('remove');
+            Route::get('/users-without-role', [RolController::class, 'getUsersWithoutRole'])->name('users.without.role');
     });
 
     // ====================
     // 🏛️ Rutas solo para ADMIN con rol "alcalde"
     // ====================
     Route::prefix('admin')->middleware(['check.role:alcalde'])->name('admin.')->group(function () {
-        // Gestión de usuarios (placeholder)
-        Route::prefix('users')->name('users.')->group(function () {
-            Route::get('/', function() {
-                return view('admin.users.index');
-            })->name('index');
-
-            Route::post('/{user}/assign-role', function() {
-                // Asignar rol a usuario específico
-            })->name('assign.role');
+        // Gestión de usuarios pendientes de aprobación
+        Route::prefix('usuarios')->name('usuarios.')->group(function () {
+            Route::get('/pendientes', [RolController::class, 'usuariosPendientes'])->name('pendientes');
+            Route::post('/{usuario}/asignar-rol', [RolController::class, 'asignarRol'])->name('asignar-rol');
         });
 
         // Configuración del sistema

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Role;
+use App\Models\Roles;
 
 class RoleSeeder extends Seeder
 {
@@ -89,7 +89,7 @@ class RoleSeeder extends Seeder
         ];
 
         foreach ($roles as $roleData) {
-            Role::firstOrCreate(
+            Roles::firstOrCreate(
                 ['name' => $roleData['name']],
                 [
                     'description' => $roleData['description'],

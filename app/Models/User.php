@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -47,11 +46,33 @@ class User extends Authenticatable
         ];
     }
     /**
+     * Get the role of the user
+     */
+    public function role()
+    {
+        return $this->belongsTo(Roles::class, 'role_id');
+    }
+
+    /**
      * Get user role name
      */
     public function getRoleName()
     {
         return $this->role ? $this->role->name : 'Sin rol';
+    }
+
+    /**
+     * Check if user has any of the given roles
+     */
+    public function hasAnyRole($roles)
+    {
+        if (!$this->role) {
+            return false;
+        }
+        if (is_array($roles)) {
+            return in_array($this->role->name, $roles);
+        }
+        return $this->role->name === $roles;
     }
 
     /**

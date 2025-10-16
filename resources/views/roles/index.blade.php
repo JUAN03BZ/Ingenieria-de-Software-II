@@ -18,7 +18,7 @@
                     Gestión de Roles
                 </h2>
                 
-                @if(Auth::user()->hasRole('alcalde'))
+                @if(Auth::user()->checkRole('alcalde'))
                 <a href="{{ route('roles.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i>
                     Nuevo Rol
@@ -283,9 +283,13 @@
 
 @push('scripts')
 <script>
-    // Auto-ocultar alertas después de 5 segundos
-    setTimeout(function() {
-        $('.alert').fadeOut('slow');
+    // Auto-ocultar alertas después de 5 segundos (sin jQuery)
+    setTimeout(function () {
+        document.querySelectorAll('.alert').forEach(function (el) {
+            el.style.transition = 'opacity 0.5s ease';
+            el.style.opacity = '0';
+            setTimeout(function(){ el.style.display = 'none'; }, 600);
+        });
     }, 5000);
 </script>
 @endpush

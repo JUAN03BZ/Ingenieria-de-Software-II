@@ -297,6 +297,17 @@
         <a class="nav-link" href="{{ route('cuenta.cobro.create') }}">
             <i class="fas fa-plus-circle me-2"></i><span>Nueva Cuenta</span>
         </a>
+        @if(Auth::user()->role_id && Auth::user()->role->name === 'alcalde')
+        <div class="mt-4">
+            <h6 class="text-light-50 text-uppercase px-3">Administración</h6>
+            <a class="nav-link" href="{{ route('admin.usuarios.pendientes') }}">
+                <i class="fas fa-user-clock me-2"></i><span>Usuarios Pendientes</span>
+            </a>
+            <a class="nav-link" href="{{ route('roles.index') }}">
+                <i class="fas fa-users-cog me-2"></i><span>Gestión de Roles</span>
+            </a>
+        </div>
+        @endif
         <a class="nav-link" href="#">
             <i class="fas fa-chart-bar me-2"></i><span>Reportes</span>
         </a>
@@ -314,6 +325,17 @@
                 <div class="col-12">
                     <h1 class="h3">¡Bienvenido, {{ Auth::user()->name }}!</h1>
                     <p class="text-muted">Gestiona tus cuentas de cobro de manera eficiente</p>
+                        <!-- 🔹 Información del usuario -->
+                        <div class="card bg-dark border-0 shadow-sm mt-3 mb-2" style="max-width: 400px;">
+                            <div class="card-body py-3">
+                                <h6 class="mb-2 text-info"><i class="fas fa-user me-1"></i>Información de tu cuenta</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li><strong>Nombre:</strong> {{ Auth::user()->name }}</li>
+                                    <li><strong>Email:</strong> {{ Auth::user()->email }}</li>
+                                    <li><strong>Rol:</strong> {{ Auth::user()->role->name ?? 'Sin rol' }}</li>
+                                </ul>
+                            </div>
+                        </div>
                 </div>
             </div>
 
@@ -409,8 +431,21 @@
                     <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i>Actividad Reciente</h5>
                 </div>
                 <div class="card-body text-center py-4">
-                    @if($totalCuentas ?? 0 > 0)
-                        <p class="text-light">Tienes {{ $totalCuentas ?? 0 }} cuenta(s) registrada(s). Revisa la sección de <a href="{{ route('cuenta.cobro.index') }}">Cuentas de Cobro</a>.</p>
+                    @if($actividadesRecientes->count() > 0)
+                        <ul class="list-group list-group-flush bg-transparent">
+                            @foreach($actividadesRecientes as $cuenta)
+                                <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center mb-2" style="border-radius:8px;">
+                                    <div>
+                                        <strong>#{{ $cuenta->id }}</strong> - {{ $cuenta->descripcion ?? 'Sin descripción' }}<br>
+                                        <small class="text-info">{{ $cuenta->fecha_emision ? date('d/m/Y', strtotime($cuenta->fecha_emision)) : 'Sin fecha' }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary">${{ number_format($cuenta->monto, 2) }}</span>
+                                        <span class="badge {{ $cuenta->estado == 'pagada' ? 'bg-success' : ($cuenta->estado == 'pendiente' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ ucfirst($cuenta->estado) }}</span>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
                     @else
                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                         <p class="text-light">No hay actividad reciente para mostrar.</p>
