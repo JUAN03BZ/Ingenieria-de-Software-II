@@ -7,3 +7,8 @@
 3. despues pegar el repositorio clonado en el proyecto local
 
 4. configurar xammp buscar linea (Config Apache), y abrir el PHP(php.ini) y eliminar el punto y coma de la linea "extension=zip" despues guardar
+
+5. En el .env agregar, para agregar el usuario administrador
+    ADMIN_EMAIL=andres@dominio.com
+    ADMIN_NAME="Andres Acevedo"
+    ADMIN_PASSWORD="julian2025*"
