@@ -2,16 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Roles;
 
 class RoleSeeder extends Seeder
 {
+    use WithoutModelEvents;
 
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $roles = [
@@ -23,8 +21,8 @@ class RoleSeeder extends Seeder
                     'view_own_cuenta_cobro',
                     'edit_own_cuenta_cobro',
                     'upload_documents',
-                    'view_contract_info'
-                ]
+                    'view_contract_info',
+                ],
             ],
             [
                 'name' => 'supervisor',
@@ -35,8 +33,8 @@ class RoleSeeder extends Seeder
                     'approve_cuenta_cobro',
                     'reject_cuenta_cobro',
                     'add_comments',
-                    'request_corrections'
-                ]
+                    'request_corrections',
+                ],
             ],
             [
                 'name' => 'alcalde',
@@ -47,8 +45,8 @@ class RoleSeeder extends Seeder
                     'override_decisions',
                     'view_reports',
                     'manage_users',
-                    'system_admin'
-                ]
+                    'system_admin',
+                ],
             ],
             [
                 'name' => 'ordenador_gasto',
@@ -59,8 +57,8 @@ class RoleSeeder extends Seeder
                     'view_budget',
                     'manage_budget',
                     'generate_payment_orders',
-                    'view_financial_reports'
-                ]
+                    'view_financial_reports',
+                ],
             ],
             [
                 'name' => 'tesoreria',
@@ -71,8 +69,8 @@ class RoleSeeder extends Seeder
                     'generate_checks',
                     'bank_transfers',
                     'payment_confirmation',
-                    'financial_reports'
-                ]
+                    'financial_reports',
+                ],
             ],
             [
                 'name' => 'contratacion',
@@ -83,21 +81,21 @@ class RoleSeeder extends Seeder
                     'view_all_cuenta_cobro',
                     'contract_validation',
                     'contractor_registration',
-                    'contract_reports'
-                ]
-            ]
+                    'contract_reports',
+                ],
+            ],
         ];
 
         foreach ($roles as $roleData) {
-            Roles::firstOrCreate(
+            Roles::updateOrCreate(
                 ['name' => $roleData['name']],
                 [
                     'description' => $roleData['description'],
-                    'permissions' => $roleData['permissions']
+                    'permissions' => $roleData['permissions'], // JSON (cast en modelo)
                 ]
             );
         }
 
-        $this->command->info('Roles creados exitosamente.');
+        $this->command->info('Roles creados/actualizados exitosamente.');
     }
 }

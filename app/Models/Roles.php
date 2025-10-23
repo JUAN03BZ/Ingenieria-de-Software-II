@@ -9,49 +9,28 @@ class Roles extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'description',
-        'permissions',
-    ];
+    protected $fillable = ['name','description','permissions'];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'permissions' => 'array',
+            'permissions' => 'array', // requiere columna JSON en migración
         ];
     }
 
-    /**
-     * Get the users for this role.
-     */
+    // Relación inversa: usuarios con este rol
     public function users()
     {
-    return $this->hasMany(User::class, 'role_id');
+        return $this->hasMany(User::class, 'role_id');
     }
 
-    /**
-     * Check if role has a specific permission
-     */
-    public function hasPermission($permission)
+    // ¿El rol tiene un permiso?
+    public function hasPermission(string $permission): bool
     {
-        return in_array($permission, $this->permissions ?? []);
+        return in_array($permission, $this->permissions ?? [], true);
     }
 
-    /**
-     * Roles predefinidos del sistema
-     */
-    public static function getSystemRoles()
+    public static function getSystemRoles(): array
     {
         return [
             'contratista' => 'Contratista',
@@ -59,7 +38,7 @@ class Roles extends Model
             'alcalde' => 'Alcalde',
             'ordenador_gasto' => 'Ordenador del Gasto',
             'tesoreria' => 'Tesorería',
-            'contratacion' => 'Contratación'
+            'contratacion' => 'Contratación',
         ];
     }
 }

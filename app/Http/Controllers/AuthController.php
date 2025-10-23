@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -15,43 +14,48 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Procesar el login
+    // Procesar el login con verificación de aprobación
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        $credentials = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $remember = $request->boolean('remember');
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');
+
+            $user = Auth::user();
+
+            if (!$user->is_approved) {
+                Auth::logout();
+                return back()->with('error', 'Tu cuenta está pendiente de aprobación.'); // flash
+            }
+
+            return redirect()->intended(route('dashboard'));
         }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
-        ])->onlyInput('email');
+        return back()->with('error', 'Credenciales inválidas.');
     }
 
     // Mostrar dashboard/menú principal
     public function dashboard()
     {
         $user = Auth::user();
-        // Obtener todas las cuentas de cobro del usuario
         $cuentas = \App\Models\CuentaCobro::where('user_id', $user->id)->get();
 
-        $totalCuentas = $cuentas->count();
-        $pagadas = $cuentas->where('estado', 'pagada')->count();
-        $pendientes = $cuentas->where('estado', 'pendiente')->count();
-        // Total facturado este mes
+        $totalCuentas   = $cuentas->count();
+        $pagadas        = $cuentas->where('estado', 'pagada')->count();
+        $pendientes     = $cuentas->where('estado', 'pendiente')->count();
         $totalFacturado = $cuentas->where('estado', 'pagada')
             ->where('fecha_emision', '>=', now()->startOfMonth())
             ->sum('monto');
 
-    $actividadesRecientes = $cuentas->sortByDesc('created_at')->take(5);
-    return view('dashboard', compact('totalCuentas', 'pagadas', 'pendientes', 'totalFacturado', 'actividadesRecientes'));
+        $actividadesRecientes = $cuentas->sortByDesc('created_at')->take(5);
+
+        return view('dashboard', compact('totalCuentas', 'pagadas', 'pendientes', 'totalFacturado', 'actividadesRecientes'));
     }
 
     // Procesar logout
@@ -60,7 +64,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect('/login');
     }
 }

@@ -6,39 +6,56 @@ use Illuminate\Http\Request;
 use App\Models\Roles;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class RolController extends Controller
 {
-    /**
-     * Constructor - Middleware de autenticación
-     */
     public function __construct()
     {
+        // Asegura usuario autenticado antes de cualquier acción
         $this->middleware('auth');
     }
 
-    /**
-     * Mostrar lista de todos los roles
-     */
+    // Helpers internos para evitar depender de métodos inexistentes en User
+    private function currentUser(): ?User
+    {
+        $user = Auth::user();
+        if ($user) {
+            $user->loadMissing('role'); // requiere belongsTo('role') en User
+        }
+        return $user;
+    }
+
+    private function userHasRole(string|array $roles): bool
+    {
+        $user = $this->currentUser();
+        if (!$user || !$user->role) {
+            return false;
+        }
+        $roles = (array) $roles;
+        return in_array($user->role->name, $roles, true);
+    }
+
+    private function isAdmin(): bool
+    {
+        // Define “admin” como rol alcalde para este módulo
+        return $this->userHasRole('alcalde');
+    }
+
     public function index()
     {
-        // Solo admins pueden ver todos los roles
-        if (!Auth::user()->isAdmin()) {
+        if (!$this->isAdmin()) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para acceder a esta sección.');
         }
 
-        // CORREGIR: usar withCount con la relación correcta
+        // Requiere que el modelo Roles tenga la relación users(): hasMany(User::class, 'role_id')
         $roles = Roles::withCount('users')->get();
+
         return view('roles.index', compact('roles'));
     }
 
-    /**
-     * Mostrar formulario para crear nuevo rol
-     */
     public function create()
     {
-        if (!Auth::user()->hasRole('alcalde')) {
+        if (!$this->userHasRole('alcalde')) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para crear roles.');
         }
 
@@ -46,87 +63,66 @@ class RolController extends Controller
         return view('roles.create', compact('availablePermissions'));
     }
 
-    /**
-     * Almacenar nuevo rol
-     */
     public function store(Request $request)
     {
-        if (!Auth::user()->hasRole('alcalde')) {
+        if (!$this->userHasRole('alcalde')) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para crear roles.');
         }
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name|regex:/^[a-z_]+$/',
+            'name'        => 'required|string|max:255|unique:roles,name|regex:/^[a-z_]+$/',
             'description' => 'required|string|max:500',
             'permissions' => 'array'
         ]);
 
         $role = Roles::create([
-            'name' => $request->name,
+            'name'        => $request->name,
             'description' => $request->description,
-            'permissions' => $request->permissions ?? []
+            'permissions' => $request->permissions ?? [],
         ]);
 
-        return redirect()->route('roles.index')
-            ->with('success', 'Rol creado exitosamente.');
+        return redirect()->route('roles.index')->with('success', 'Rol creado exitosamente.');
     }
 
-    /**
-     * Mostrar detalles de un rol específico
-     */
     public function show(Roles $role)
     {
-        if (!Auth::user()->isAdmin()) {
+        if (!$this->isAdmin()) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para ver esta información.');
         }
 
-        // CORREGIR: cargar usuarios con paginación
-        $users = $role->users()->paginate(10);
+        $users = $role->users()->paginate(10); // requiere users() en Roles
         $availablePermissions = $this->getAvailablePermissions();
-        
+
         return view('roles.show', compact('role', 'users', 'availablePermissions'));
     }
 
-    /**
-     * Otros métodos del controlador...
-     */
-
-    /**
-     * Mostrar formulario de edición de un rol
-     */
     public function edit(Roles $role)
     {
-        if (!Auth::user()->hasRole('alcalde')) {
+        if (!$this->userHasRole('alcalde')) {
             return redirect()->route('roles.index')->with('error', 'No tienes permisos para editar roles.');
         }
 
         return view('roles.edit', compact('role'));
     }
 
-    /**
-     * Actualizar un rol existente
-     */
     public function update(Request $request, Roles $role)
     {
-        if (!Auth::user()->hasRole('alcalde')) {
+        if (!$this->userHasRole('alcalde')) {
             return redirect()->route('roles.index')->with('error', 'No tienes permisos para actualizar roles.');
         }
 
-        $isSystemRole = in_array($role->name, ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion']);
+        $isSystemRole = in_array($role->name, ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion'], true);
 
-        $rules = [
-            'permissions' => 'array',
-        ];
+        $rules = ['permissions' => 'array'];
 
         if (!$isSystemRole) {
             $rules = array_merge($rules, [
-                'name' => 'required|string|max:255|regex:/^[a-z_]+$/|unique:roles,name,' . $role->id,
+                'name'        => 'required|string|max:255|regex:/^[a-z_]+$/|unique:roles,name,' . $role->id,
                 'description' => 'required|string|max:500',
             ]);
         } else {
-            // Asegurar presencia (vienen como hidden en la vista), pero no se modifican
             $rules = array_merge($rules, [
-                'name' => 'required|string',
+                'name'        => 'required|string',
                 'description' => 'required|string',
             ]);
         }
@@ -134,10 +130,9 @@ class RolController extends Controller
         $validated = $request->validate($rules);
 
         if ($isSystemRole) {
-            // Solo permisos en roles del sistema
             $role->permissions = $request->input('permissions', []);
         } else {
-            $role->name = $request->input('name');
+            $role->name        = $request->input('name');
             $role->description = $request->input('description');
             $role->permissions = $request->input('permissions', []);
         }
@@ -147,16 +142,13 @@ class RolController extends Controller
         return redirect()->route('roles.show', $role->id)->with('success', 'Rol actualizado correctamente.');
     }
 
-    /**
-     * Eliminar un rol
-     */
     public function destroy(Roles $role)
     {
-        if (!Auth::user()->hasRole('alcalde')) {
+        if (!$this->userHasRole('alcalde')) {
             return redirect()->route('roles.index')->with('error', 'No tienes permisos para eliminar roles.');
         }
 
-        if (in_array($role->name, ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion'])) {
+        if (in_array($role->name, ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion'], true)) {
             return redirect()->route('roles.index')->with('error', 'No se pueden eliminar roles del sistema.');
         }
 
@@ -169,12 +161,9 @@ class RolController extends Controller
         return redirect()->route('roles.index')->with('success', 'Rol eliminado correctamente.');
     }
 
-    /**
-     * Asignar un rol a un usuario (AJAX)
-     */
     public function assignRole(Request $request)
     {
-        if (!Auth::user()->hasAnyRole(['alcalde', 'contratacion'])) {
+        if (!$this->userHasRole(['alcalde', 'contratacion'])) {
             return response()->json(['success' => false, 'error' => 'No autorizado'], 403);
         }
 
@@ -190,12 +179,9 @@ class RolController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Remover rol de un usuario (AJAX)
-     */
     public function removeRole(Request $request)
     {
-        if (!Auth::user()->hasAnyRole(['alcalde', 'contratacion'])) {
+        if (!$this->userHasRole(['alcalde', 'contratacion'])) {
             return response()->json(['success' => false, 'error' => 'No autorizado'], 403);
         }
 
@@ -210,30 +196,50 @@ class RolController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Obtener usuarios sin rol (AJAX)
-     */
-    public function getUsersWithoutRole()
+    // NUEVOS: aprobación y asignación de roles por admin
+    public function usuariosPendientes()
     {
-        if (!Auth::user()->hasAnyRole(['alcalde', 'contratacion'])) {
-            return response()->json(['success' => false, 'error' => 'No autorizado'], 403);
+        if (!$this->userHasRole('alcalde')) {
+            abort(403);
         }
 
-        $users = User::whereNull('role_id')
-            ->select('id', 'name', 'email')
-            ->orderBy('name')
-            ->get();
-
-        return response()->json(['success' => true, 'data' => $users]);
+        $usuarios = User::where('is_approved', false)->orderBy('created_at', 'desc')->paginate(15);
+        $roles = Roles::orderBy('name')->get(['id', 'name']);
+        return view('usuarios.pendientes', compact('usuarios', 'roles'));
     }
 
-    /**
-     * Obtener permisos disponibles
-     */
+    public function aprobarUsuario(Request $request, User $usuario)
+    {
+        if (!$this->userHasRole('alcalde')) {
+            abort(403);
+        }
+
+        $usuario->is_approved = true;
+        $usuario->approved_at = now();
+        $usuario->save();
+
+        return back()->with('success', 'Usuario aprobado correctamente.');
+    }
+
+    public function asignarRol(Request $request, User $usuario)
+    {
+        if (!$this->userHasRole('alcalde')) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        $usuario->role_id = $data['role_id'];
+        $usuario->save();
+
+        return back()->with('success', 'Rol asignado correctamente.');
+    }
+
     private function getAvailablePermissions()
     {
         return [
-            // Cuentas de Cobro
             'create_cuenta_cobro',
             'view_cuenta_cobro',
             'view_own_cuenta_cobro',
@@ -243,44 +249,30 @@ class RolController extends Controller
             'approve_cuenta_cobro',
             'reject_cuenta_cobro',
             'final_approval',
-            
-            // Documentos
             'upload_documents',
             'view_documents',
-            
-            // Contratos
             'view_contract_info',
             'manage_contracts',
             'contract_validation',
-            
-            // Pagos
             'authorize_payment',
             'process_payment',
             'generate_checks',
             'bank_transfers',
             'payment_confirmation',
             'generate_payment_orders',
-            
-            // Presupuesto
             'view_budget',
             'manage_budget',
-            
-            // Reportes
             'view_reports',
             'financial_reports',
             'view_financial_reports',
             'contract_reports',
-            
-            // Administración
             'manage_users',
             'manage_contractors',
             'contractor_registration',
             'system_admin',
-            
-            // Otros
             'add_comments',
             'request_corrections',
-            'override_decisions'
+            'override_decisions',
         ];
     }
 }

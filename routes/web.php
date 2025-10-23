@@ -7,110 +7,66 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CuentaCobroController;
 use App\Http\Controllers\RolController;
 
-// Ruta raíz redirige al login
-Route::get('/', function () {
-    return redirect('/login');
-});
+// Raíz
+Route::get('/', fn () => redirect('/login'));
 
-// ====================
-// 🔐 Rutas de Autenticación (públicas)
-// ====================
+// Auth (públicas)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// ====================
-// 👤 Registro de usuarios (público)
-// ====================
+// Registro (público)
 Route::get('/register', [CrearUsuario::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [CrearUsuario::class, 'register']);
 
-// ====================
-// 👥 Rutas de Clientes (públicas o según tu elección)
-// ====================
+// Clientes (públicas)
 Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
 Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
 Route::post('/clientes/guardar', [ClienteController::class, 'guardar'])->name('clientes.guardar');
 
-// ====================
-// 🔒 Rutas protegidas por autenticación
-// ====================
+// Protegidas por autenticación
 Route::middleware(['auth'])->group(function () {
-    
-    // 📊 Dashboard
+    // Dashboard
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
-    // ====================
-    // 💰 Cuentas de Cobro
-    // ====================
+    // Cuentas de Cobro
     Route::get('/cuenta-cobro/create', [CuentaCobroController::class, 'create'])->name('cuenta.cobro.create');
     Route::post('/cuenta-cobro/guardar', [CuentaCobroController::class, 'store'])->name('cuenta.cobro.guardar');
     Route::get('/cuentas-cobro', [CuentaCobroController::class, 'index'])->name('cuenta.cobro.index');
 
-    // ====================
-    // 🧩 Rutas de Roles
-    // ====================
-        Route::resource('roles', RolController::class)->except(['show'])->names([
-        'index' => 'roles.index',
-        'create' => 'roles.create',
-        'store' => 'roles.store',
-        'edit' => 'roles.edit',
-        'update' => 'roles.update',
-        'destroy' => 'roles.destroy',
-    ]);
+    // Rutas de roles: primero estáticas, luego la dinámica para evitar colisión con {role}
+    // Crear/editar/eliminar (solo alcalde)
+    Route::middleware('role:alcalde')->group(function () {
+        Route::get('/roles/create', [RolController::class, 'create'])->name('roles.create');
+        Route::post('/roles', [RolController::class, 'store'])->name('roles.store');
+        Route::get('/roles/{role}/edit', [RolController::class, 'edit'])->name('roles.edit');
+        Route::put('/roles/{role}', [RolController::class, 'update'])->name('roles.update');
+        Route::delete('/roles/{role}', [RolController::class, 'destroy'])->name('roles.destroy');
 
-    // Ruta personalizada para mostrar un rol específico
-        Route::get('/roles/{role}', [RolController::class, 'show'])->name('roles.show');
+        // Admin: usuarios pendientes y asignación de rol
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('/usuarios/pendientes', [RolController::class, 'usuariosPendientes'])->name('usuarios.pendientes');
+            Route::post('/usuarios/{usuario}/aprobar', [RolController::class, 'aprobarUsuario'])->name('usuarios.aprobar');
+            Route::post('/usuarios/{usuario}/asignar-rol', [RolController::class, 'asignarRol'])->name('usuarios.asignar-rol');
+            Route::get('/settings', fn () => view('admin.settings'))->name('settings');
+        });
 
-    // ====================
-    // ⚙️ Rutas adicionales de Roles
-    // ====================
-    Route::prefix('roles')->name('roles.')->group(function () {
+        // Acciones AJAX de roles (alcalde o contratación)
+        Route::prefix('roles')->name('roles.')->middleware('role:alcalde,contratacion')->group(function () {
             Route::post('/assign-role', [RolController::class, 'assignRole'])->name('assign');
             Route::post('/remove-role', [RolController::class, 'removeRole'])->name('remove');
             Route::get('/users-without-role', [RolController::class, 'getUsersWithoutRole'])->name('users.without.role');
-    });
-
-    // ====================
-    // 🏛️ Rutas solo para ADMIN con rol "alcalde"
-    // ====================
-    Route::prefix('admin')->middleware(['check.role:alcalde'])->name('admin.')->group(function () {
-        // Gestión de usuarios pendientes de aprobación
-        Route::prefix('usuarios')->name('usuarios.')->group(function () {
-            Route::get('/pendientes', [RolController::class, 'usuariosPendientes'])->name('pendientes');
-            Route::post('/{usuario}/asignar-rol', [RolController::class, 'asignarRol'])->name('asignar-rol');
         });
-
-        // Configuración del sistema
-        Route::get('/settings', function() {
-            return view('admin.settings');
-        })->name('settings');
     });
+
+    // Listado (index) accesible a autenticados
+    Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
+
+    // Mostrar detalle (show) DEBE IR AL FINAL, después de create/edit
+    Route::get('/roles/{role}', [RolController::class, 'show'])->name('roles.show');
 });
 
-// ====================
-// 🧠 Rutas por tipo de rol
-// ====================
-Route::middleware(['auth'])->group(function () {
-
-    // Contratista
-    Route::middleware(['check.role:contratista'])->prefix('contratista')->name('contratista.')->group(function () {
-        Route::get('/dashboard', function() {
-            return view('contratista.dashboard');
-        })->name('dashboard');
-    });
-
-    // Supervisor
-    Route::middleware(['check.role:supervisor'])->prefix('supervisor')->name('supervisor.')->group(function () {
-        Route::get('/dashboard', function() {
-            return view('supervisor.dashboard');
-        })->name('dashboard');
-    });
-
-    // Roles administrativos (alcalde, ordenador del gasto)
-    Route::middleware(['check.role:alcalde,ordenador_gasto'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/reports', function() {
-            return view('admin.reports');
-        })->name('reports');
-    });
+// Reportes para 'alcalde' y 'ordenador_gasto'
+Route::middleware(['auth', 'role:alcalde,ordenador_gasto'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/reports', fn () => view('admin.reports'))->name('reports');
 });

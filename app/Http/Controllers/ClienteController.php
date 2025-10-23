@@ -1,40 +1,40 @@
 <?php
+// app/Http/Controllers/ClienteController.php [web:264]
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ClienteController extends Controller
 {
-
-    // Método para listar clientes (mínimo: devuelve una vista vacía por ahora)
     public function index()
     {
-        // Temporal: Si no tienes modelo, solo muestra un mensaje
-        // Después, usa: $clientes = Cliente::all()s; return view('clientes.index', compact('clientes'));
-        return view('clientes.index'); // Crea esta vista si no existe (ver Paso 4)
+        $clientes = Cliente::latest()->paginate(15);
+        return view('clientes.index', compact('clientes'));
     }
 
-    // Método para mostrar formulario de crear cliente
     public function create()
     {
-        return view('clientes.create'); // Crea esta vista si no existe (ver Paso 4)
+        return view('clientes.create');
     }
 
-    // Método para guardar cliente (el que ya tenías, ajustado)
     public function guardar(Request $request)
     {
-        // Validación básica (ajusta según tus necesidades)
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'documento' => 'required|string|max:20',
-            'email' => 'required|email',
-            // Agrega más campos si los tienes
+        $data = $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'documento' => 'required|string|max:20|unique:clientes,documento',
+            'email'     => 'required|email|max:255|unique:clientes,email',
+            'telefono'  => 'nullable|string|max:50',
         ]);
 
-        // Aquí guardarías en BD (ej. Cliente::create($validated);)
-        // Por ahora, solo redirige con éxito
-        return redirect()->route('clientes.index')->with('success', 'Cliente guardado exitosamente (simulado).');
+        if (Auth::check()) {
+            $data['user_id'] = Auth::id();
+        }
+
+        $cliente = Cliente::create($data);
+
+        return redirect()->route('clientes.index')->with('success', 'Cliente creado exitosamente con ID: ' . $cliente->id);
     }
 }

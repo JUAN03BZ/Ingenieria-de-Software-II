@@ -3,22 +3,25 @@
 @section('title', 'Gestión de Roles - CuentasCobro')
 
 @section('content')
+@php
+    // Variable reutilizable: considera "alcalde" como rol con permisos de gestión en esta vista
+    $canManageRoles = auth()->check() && (auth()->user()?->role?->name === 'alcalde');
+@endphp
+
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar (opcional, puedes agregarlo después) -->
         <div class="col-md-2">
             <!-- Sidebar content -->
         </div>
-        
-        <!-- Main content -->
+
         <div class="col-md-10">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="fw-bold text-dark">
                     <i class="fas fa-users-cog me-2"></i>
                     Gestión de Roles
                 </h2>
-                
-                @if(Auth::user()->checkRole('alcalde'))
+
+                @if($canManageRoles)
                 <a href="{{ route('roles.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i>
                     Nuevo Rol
@@ -26,7 +29,6 @@
                 @endif
             </div>
 
-            <!-- Mensajes de éxito/error -->
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="fas fa-check-circle me-2"></i>
@@ -43,7 +45,6 @@
             </div>
             @endif
 
-            <!-- Estadísticas de roles -->
             <div class="row mb-4">
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="card bg-primary text-white">
@@ -60,7 +61,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="card bg-success text-white">
                         <div class="card-body">
@@ -76,7 +77,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="card bg-warning text-white">
                         <div class="card-body">
@@ -92,7 +93,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-3 col-md-6 mb-3">
                     <div class="card bg-info text-white">
                         <div class="card-body">
@@ -110,7 +111,6 @@
                 </div>
             </div>
 
-            <!-- Tabla de roles -->
             <div class="card shadow">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">
@@ -130,7 +130,7 @@
                                     <th><i class="fas fa-users me-1"></i>Usuarios</th>
                                     <th><i class="fas fa-key me-1"></i>Permisos</th>
                                     <th><i class="fas fa-calendar me-1"></i>Creado</th>
-                                    @if(Auth::user()->isAdmin())
+                                    @if($canManageRoles)
                                     <th class="text-center"><i class="fas fa-cogs me-1"></i>Acciones</th>
                                     @endif
                                 </tr>
@@ -191,17 +191,22 @@
                                     <td>
                                         <small class="text-muted">{{ $role->created_at->format('d/m/Y') }}</small>
                                     </td>
-                                    @if(Auth::user()->isAdmin())
+
+                                    @if($canManageRoles)
                                     <td class="text-center">
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a href="{{ route('roles.show', $role->id) }}" class="btn btn-outline-info" title="Ver detalles">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            @if(Auth::user()->hasRole('alcalde'))
+
                                             <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-outline-warning" title="Editar">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            @if(!in_array($role->name, ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion']) && $role->users_count == 0)
+
+                        @php
+                            $sistema = ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion'];
+                        @endphp
+                                            @if(!in_array($role->name, $sistema, true) && $role->users_count == 0)
                                             <form action="{{ route('roles.destroy', $role->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar este rol?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -210,16 +215,14 @@
                                                 </button>
                                             </form>
                                             @endif
-                                            @endif
                                         </div>
                                     </td>
                                     @endif
                                 </tr>
-                                
-                                <!-- Colapso para mostrar permisos -->
+
                                 @if($role->permissions && count($role->permissions) > 0)
                                 <tr class="collapse" id="permissions-{{ $role->id }}">
-                                    <td colspan="{{ Auth::user()->isAdmin() ? '7' : '6' }}" class="bg-light">
+                                    <td colspan="{{ $canManageRoles ? '7' : '6' }}" class="bg-light">
                                         <div class="p-2">
                                             <strong class="text-muted">Permisos asignados:</strong>
                                             <div class="mt-2">
@@ -243,7 +246,7 @@
                         <i class="fas fa-users-cog fa-4x text-muted mb-3"></i>
                         <h4 class="text-muted">No hay roles registrados</h4>
                         <p class="text-muted">Comienza creando el primer rol del sistema.</p>
-                        @if(Auth::user()->hasRole('alcalde'))
+                        @if($canManageRoles)
                         <a href="{{ route('roles.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i>
                             Crear Primer Rol
@@ -259,31 +262,15 @@
 
 @push('styles')
 <style>
-    .card {
-        border: none;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-    
-    .table th {
-        border-top: none;
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-    
-    .badge {
-        font-size: 0.75rem;
-    }
-    
-    .btn-group-sm > .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.775rem;
-    }
+    .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075); }
+    .table th { border-top: none; font-weight: 600; font-size: .875rem; }
+    .badge { font-size: .75rem; }
+    .btn-group-sm > .btn { padding: .25rem .5rem; font-size: .775rem; }
 </style>
 @endpush
 
 @push('scripts')
 <script>
-    // Auto-ocultar alertas después de 5 segundos (sin jQuery)
     setTimeout(function () {
         document.querySelectorAll('.alert').forEach(function (el) {
             el.style.transition = 'opacity 0.5s ease';
