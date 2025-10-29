@@ -1,72 +1,82 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - CuentasCobro</title>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+</head>
+<body>
+    <div class="scroll-down">Baja para iniciar sesion
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+            <path d="M16 3C8.832031 3 3 8.832031 3 16s5.832031 13 13 13 13-5.832031 13-13S23.167969 3 16 3zm0 2c6.085938 0 11 4.914063 11 11 0 6.085938-4.914062 11-11 11-6.085937 0-11-4.914062-11-11C5 9.914063 9.914063 5 16 5zm-1 4v10.28125l-4-4-1.40625 1.4375L16 23.125l6.40625-6.40625L21 15.28125l-4 4V9z"/> 
+        </svg>
+    </div>
 
-@section('title', 'Iniciar Sesión - CuentasCobro')
+    <div class="container"></div>
 
-@section('content')
-<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap" rel="stylesheet">
+    <div class="modal">
+        <div class="modal-container">
+            <div class="modal-left">
+                <h1 class="modal-title">¡Bienvenido!</h1>
+                <p class="modal-desc">Inicia sesión en CuentasCobro para continuar</p>
 
-<style>
-    body { background: linear-gradient(135deg, #1f3f99ff 0%, #000000ff 100%); height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Dosis','Poppins',sans-serif; }
-    .login-box { background: rgba(10, 20, 40, 0.95); padding: 64px 48px 48px 48px; border-radius: 18px; width: 100%; max-width: 520px; box-shadow: 0 0 40px rgba(31,63,153,.25); text-align: center; color: #fff; position: relative; border: 2px solid #1f3f99ff; }
-    .login-box .avatar { background: linear-gradient(135deg, #1f3f99ff 0%, #000000ff 100%); width: 100px; height: 100px; border-radius: 50%; position: absolute; top: -50px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(31,63,153,.18); }
-    .login-box .avatar i { font-size: 50px; color: #fff; }
-    .inputbox { position: relative; width: 100%; display: flex; flex-direction: column; }
-    .inputbox label { margin-bottom: 8px; color: #45f3ff; font-size: 1.1em; letter-spacing: .05em; text-align: left; }
-    .inputbox input { width: 100%; padding: 16px 14px; background: rgba(255,241,241,.05); border-radius: 8px; outline: none; border: none; color: #fff; font-size: 1.1em; letter-spacing: .05em; transition: .4s ease; font-family: 'Dosis','Poppins',sans-serif; position: relative; z-index: 2; }
-    .inputbox input:focus { background: linear-gradient(90deg, rgba(255,255,255,.15), rgba(234,84,85,.15)); box-shadow: 0 0 10px rgba(69,243,255,.3); }
-    .login-box .form-check-label { color: #b0b0b0; font-size: 1rem; }
-    .login-box .forgot-password { float: right; color: #ea5455; font-size: .95rem; text-decoration: none; transition: color .3s; }
-    .login-box .forgot-password:hover { color: #fff; }
-    .login-box button { transition: all .3s ease-in-out; font-family: "Dosis", sans-serif; width: 180px; height: 58px; border-radius: 50px; background-image: linear-gradient(135deg, #1f3f99ff 0%, #9290a3ff 100%); box-shadow: 0 20px 30px -6px rgba(102,197,214,.5); border: none; font-size: 22px; color: white; display: inline-flex; align-items: center; justify-content: center; margin: 30px auto 0 auto; cursor: pointer; }
-    .login-box button:hover { transform: translateY(3px); box-shadow: none; }
-    .login-box button:active { opacity: .6; }
-    .login-box button:focus { box-shadow: 0 0 0 4px rgba(234,84,85,.2); outline: none; }
-</style>
+                {{-- Mensajes flash --}}
+                @if(session('success'))
+                    <div class="alert success">{{ session('success') }}</div>
+                @endif
+                @if(session('error'))
+                    <div class="alert error">{{ session('error') }}</div>
+                @endif
 
-<div class="login-box">
-    <div class="avatar"><i class="fas fa-user"></i></div>
+                {{-- Errores de validación --}}
+                @if ($errors->any())
+                    <div class="alert error">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-    <h3 class="mb-4">Iniciar Sesión</h3>
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
 
-    {{-- Mensajes flash --}}
-    @if(session('success'))
-        <div class="alert alert-success py-2">{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger py-2">{{ session('error') }}</div>
-    @endif
+                    <div class="input-block">
+                        <label for="email" class="input-label">Correo electrónico</label>
+                        <input type="email" name="email" id="email" placeholder="usuario@ejemplo.com" required value="{{ old('email') }}">
+                    </div>
 
-    {{-- Errores de validación --}}
-    @if ($errors->any())
-        <div class="alert alert-danger py-2">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li style="list-style: none;">{{ $error }}</li>
-                @endforeach
-            </ul>
+                    <div class="input-block">
+                        <label for="password" class="input-label">Contraseña</label>
+                        <input type="password" name="password" id="password" placeholder="********" required>
+                    </div>
+
+                    <div class="modal-buttons">
+                        <a href="#">¿Olvidaste tu contraseña?</a>
+                        <button type="submit" class="input-button">Ingresar</button>
+                    </div>
+
+                    <p class="sign-up">¿No tienes una cuenta? <a href="{{ route('register') }}">Regístrate aquí</a></p>
+                </form>
+            </div>
+
+            <div class="modal-right">
+                <img src="{{ asset('img/img2.jpg') }}" alt="">
+            </div>
+
+            <button class="icon-button close-button" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                    <path d="M 25 3 C 12.86158 3 3 12.86158 3 25 C 3 37.13842 12.86158 47 25 47 C 37.13842 47 47 37.13842 47 25 C 47 12.86158 37.13842 3 25 3 z M 25 5 C 36.05754 5 45 13.94246 45 25 C 45 36.05754 36.05754 45 25 45 C 13.94246 45 5 36.05754 5 25 C 5 13.94246 13.94246 5 25 5 z M 16.990234 15.990234 A 1.0001 1.0001 0 0 0 16.292969 17.707031 L 23.585938 25 L 16.292969 32.292969 A 1.0001 1.0001 0 1 0 17.707031 33.707031 L 25 26.414062 L 32.292969 33.707031 A 1.0001 1.0001 0 1 0 33.707031 32.292969 L 26.414062 25 L 33.707031 17.707031 A 1.0001 1.0001 0 0 0 32.980469 15.990234 A 1.0001 1.0001 0 0 0 32.292969 16.292969 L 25 23.585938 L 17.707031 16.292969 A 1.0001 1.0001 0 0 0 16.990234 15.990234 z"></path>
+                </svg>
+            </button>
         </div>
-    @endif
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+        <button class="modal-button" type="button">Haz clic aquí para iniciar sesión</button>
+    </div>
 
-        <div class="inputbox" style="margin-bottom: 28px;">
-            <label for="email">Usuario</label>
-            <input type="email" name="email" id="email" required autofocus value="{{ old('email') }}">
-        </div>
-
-        <div class="inputbox" style="margin-bottom: 28px;">
-            <label for="password">Contraseña</label>
-            <input type="password" name="password" id="password" required>
-        </div>
-
-        <div class="form-check mb-3 text-start">
-            <input class="form-check-input" type="checkbox" name="remember" id="remember">
-            <label class="form-check-label" for="remember">Recordarme</label>
-            <a href="{{ route('register') }}" class="forgot-password">Crear usuario</a>
-        </div>
-
-        <button type="submit">Ingresar</button>
-    </form>
-</div>
-@endsection
+    <script src="{{ asset('js/auth.js') }}"></script>
+</body>
+</html>
