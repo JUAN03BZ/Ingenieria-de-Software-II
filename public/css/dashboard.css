@@ -159,3 +159,28 @@ body {
     transform: translateY(-2px);
 }
 
+
+/* ==== Estilos para la tarjeta 'Información de tu cuenta' ==== */
+.user-info-card {
+    color: #cfe8ff; /* color base del texto dentro de la tarjeta */
+}
+
+.user-info-card h6 {
+    color: #17a2b8; /* color del título (ajusta a tu preferencia) */
+    margin-bottom: 0.5rem;
+}
+
+.user-info-card ul li {
+    color: #e6eefc; /* color de los ítems */
+    margin-bottom: 0.25rem;
+}
+
+.user-info-card ul li strong {
+    color: #ffffff; /* color de las etiquetas en negrita */
+}
+
+/* Por si dejas la clase text-info en el h6: */
+.user-info-card h6.text-info {
+    color: #17a2b8 !important;
+}
+

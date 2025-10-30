@@ -98,13 +98,13 @@
         </div>
 
         <!-- INFO DE USUARIO -->
-        <div class="card bg-dark border-0 shadow-sm mt-2 mb-4" style="max-width: 400px;">
+        <div class="card bg-dark border-0 shadow-sm mt-2 mb-4 user-info-card" style="max-width: 400px;">
             <div class="card-body py-3">
-                <h6 class="mb-2 text-info"><i class="fas fa-user me-1"></i>Información de tu cuenta</h6>
+                <h5 class="mb-2"><i class="fas fa-user me-1"></i>Información de tu cuenta</h5>
                 <ul class="list-unstyled mb-0 small">
-                    <li><strong>Nombre:</strong> {{ Auth::user()->name }}</li>
-                    <li><strong>Email:</strong> {{ Auth::user()->email }}</li>
-                    <li><strong>Rol:</strong> {{ Auth::user()->role->name ?? 'Sin rol' }}</li>
+                    <li><h6 class="d-inline m-0"><strong>Nombre:</strong>  {{ Auth::user()->name }}</h6></li>
+                    <li><h6 class="d-inline m-0"><strong>Email:</strong> {{ Auth::user()->email }}</h6></li>
+                    <li><h6 class="d-inline m-0"><strong>Rol:  </strong> {{ Auth::user()->role->name ?? 'Sin rol' }}</h6></li>
                 </ul>
             </div>
         </div>
