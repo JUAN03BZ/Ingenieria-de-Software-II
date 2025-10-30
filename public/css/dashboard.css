@@ -3,9 +3,10 @@
     --sidebar-collapsed:75px;
     --sidebar-expanded:220px;
     --bg-1: #dee1ec;
-    --bg-2: #001a24;
-    --card-bg: #001a24;
-    --botones: #3a3a3a;
+    --bg-2: #c0aea3;
+    --bg-3: #55311c;
+    --card-bg: #2a778b;
+    --botones: #7581a7;
     --muted: #9fb0d3;
 }
 *{box-sizing:border-box}
@@ -18,7 +19,7 @@ body {
 
 /* ====== NAVBAR ====== */
 .navbar {
-    background: #001a24; 
+    background: linear-gradient(100deg, var(--bg-1), var(--bg-3));
     box-shadow: 0 2px 6px rgba(252, 252, 252, 0.35);
     z-index: 1000;
     position: fixed;
@@ -30,7 +31,7 @@ body {
 
 /* ====== SIDEBAR ====== */
 .sidebar {
-    background: linear-gradient(180deg, #ffffff 0%, #001a24 100%);
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-3));
     width: var(--sidebar-collapsed);
     height: 100vh;
     position: fixed;
@@ -40,7 +41,7 @@ body {
     transition: width 0.28s cubic-bezier(.2,.9,.2,1);
     z-index: 900;
     padding-top: 56px; /* espacio para navbar */
-    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.35);
+    box-shadow: 3px 0 10px rgba(226, 225, 225, 0.35);
     backdrop-filter: none;
     
 }
@@ -58,10 +59,10 @@ body {
     display:flex;
     align-items:center;
     gap:12px;
-    color: #001a24;
+    color: #050606;
     padding: 10px 12px;
     margin: 6px 6px;
-    border-radius: 10px;
+    border-radius: 15px;
     transition: background .18s ease, color .18s ease, transform .18s ease;
     white-space: nowrap;
 }
@@ -123,7 +124,8 @@ body {
     background: rgba(255,255,255,0.04);
     display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.6rem;
 }
-.metric-card h5{ margin:6px 0 0; color: #d6e4ff; }
+/* color letra de las cards */
+.metric-card h5{ margin:6px 0 0; color: #d6e4ff; } 
 .metric-card h2{ margin:6px 0; font-size:1.4rem; }
 
 /* small text */
@@ -157,5 +159,51 @@ body {
     background: rgba(255,255,255,0.03);
     color: #444242;
     transform: translateY(-2px);
+}
+
+
+/* ==== Estilos para la tarjeta 'Información de tu cuenta' ==== */
+.user-info-card {
+    color: #cfe8ff; /* color base del texto dentro de la tarjeta */
+}
+
+.user-info-card h6 {
+    color: #17a2b8; /* color del título (ajusta a tu preferencia) */
+    margin-bottom: 0.5rem;
+}
+
+.user-info-card ul li {
+    color: #e6eefc; /* color de los ítems */
+    margin-bottom: 0.25rem;
+}
+
+.user-info-card ul li strong {
+    color: #ffffff; /* color de las etiquetas en negrita */
+}
+
+/* Por si dejas la clase text-info en el h6: */
+.user-info-card h6.text-info {
+    color: #17a2b8 !important;
+}
+
+/* ==== Sidebar headers: 'Menú' y 'Administración' ==== */
+.sidebar .sidebar-header h6,
+.sidebar .mt-3 h6,
+.sidebar h6.text-uppercase.text-muted.px-2 {
+    color: #000000; /* color deseado para los encabezados del sidebar */
+    font-weight: 700;
+    letter-spacing: 0.6px;
+}
+
+/* Asegurar visibilidad cuando el sidebar está colapsado/expandido */
+.sidebar:hover .sidebar-header h6 { opacity: 1; }
+
+/* Ocultar/mostrar el header 'Administración' cuando el sidebar está colapsado/expandido */
+.sidebar .mt-3 h6 {
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+.sidebar:hover .mt-3 h6 {
+    opacity: 1;
 }
 

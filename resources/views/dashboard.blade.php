@@ -9,9 +9,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
         <!-- Botón para colapsar sidebar -->
-        <button class="toggle-btn me-3" id="toggleSidebar">
-            <i class="fas fa-bars"></i>
-        </button>
 
         <a class="navbar-brand text-light fw-bold" href="{{ route('dashboard') }}">
             <i class="fas fa-file-invoice-dollar me-2"></i>CuentasCobro
@@ -98,14 +95,18 @@
         </div>
 
         <!-- INFO DE USUARIO -->
-        <div class="card bg-dark border-0 shadow-sm mt-2 mb-4" style="max-width: 400px;">
-            <div class="card-body py-3">
-                <h6 class="mb-2 text-info"><i class="fas fa-user me-1"></i>Información de tu cuenta</h6>
-                <ul class="list-unstyled mb-0 small">
-                    <li><strong>Nombre:</strong> {{ Auth::user()->name }}</li>
-                    <li><strong>Email:</strong> {{ Auth::user()->email }}</li>
-                    <li><strong>Rol:</strong> {{ Auth::user()->role->name ?? 'Sin rol' }}</li>
-                </ul>
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-dark border-0 shadow-sm mt-2 mb-4 user-info-card" style="max-width: 500px;">
+                    <div class="card-body py-3">
+                        <h5 class="mb-2"><i class="fas fa-user me-1"></i>Información de tu cuenta</h5>
+                        <ul class="list-unstyled mb-0 small">
+                            <li><h6 class="d-inline m-0"><strong>Nombre:</strong>  {{ Auth::user()->name }}</h6></li>
+                            <li><h6 class="d-inline m-0"><strong>Email:</strong> {{ Auth::user()->email }}</h6></li>
+                            <li><h6 class="d-inline m-0"><strong>Rol:  </strong> {{ Auth::user()->role->name ?? 'Sin rol' }}</h6></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
 
