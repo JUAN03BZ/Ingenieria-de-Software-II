@@ -95,6 +95,7 @@
         </div>
 
         <!-- INFO DE USUARIO -->
+<<<<<<< HEAD
         <div class="row g-4 mb-4">
             <div class="col-md-3">
                 <div class="card bg-dark border-0 shadow-sm mt-2 mb-4 user-info-card" style="max-width: 500px;">
@@ -107,6 +108,16 @@
                         </ul>
                     </div>
                 </div>
+=======
+        <div class="card bg-dark border-0 shadow-sm mt-2 mb-4 user-info-card" style="max-width: 400px;">
+            <div class="card-body py-3">
+                <h5 class="mb-2"><i class="fas fa-user me-1"></i>Información de tu cuenta</h5>
+                <ul class="list-unstyled mb-0 small">
+                    <li><h6 class="d-inline m-0"><strong>Nombre:</strong>  {{ Auth::user()->name }}</h6></li>
+                    <li><h6 class="d-inline m-0"><strong>Email:</strong> {{ Auth::user()->email }}</h6></li>
+                    <li><h6 class="d-inline m-0"><strong>Rol:  </strong> {{ Auth::user()->role->name ?? 'Sin rol' }}</h6></li>
+                </ul>
+>>>>>>> c98953508561fc61136012912cfd8727113dddd1
             </div>
         </div>
 
