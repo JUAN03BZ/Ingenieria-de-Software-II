@@ -11,9 +11,9 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name','email','password','role_id'];
+    protected $fillable = ['name', 'email', 'password', 'role_id'];
 
-    protected $hidden = ['password','remember_token'];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
@@ -27,6 +27,7 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Roles::class, 'role_id');
+        // Si tu modelo es singular usa Role::class
     }
 
     // Nombre del rol (seguro)
@@ -53,16 +54,28 @@ class User extends Authenticatable
         return $this->hasAnyRole($roles);
     }
 
-    // Alias de conveniencia para compatibilidad con vistas/controladores existentes
+    // Alias de compatibilidad
     public function checkRole(string|array $roles): bool
     {
         return $this->hasAnyRole($roles);
     }
 
-    // ¿Es admin de este módulo?
-    public function isAdmin(): bool
+    // ¿Es “alcalde”?
+    public function isAlcalde(): bool
     {
-        return $this->hasAnyRole(['alcalde', 'ordenador_gasto']);
+        return $this->hasRole('alcalde');
+    }
+
+    // ¿Es “contratista”?
+    public function isContratista(): bool
+    {
+        return $this->hasRole('contratista');
+    }
+
+    // ¿Es “ordenador de gasto”?
+    public function isOrdenadorGasto(): bool
+    {
+        return $this->hasRole('ordenador_gasto');
     }
 
     // ¿Puede aprobar pagos?
@@ -77,7 +90,7 @@ class User extends Authenticatable
         return $this->hasAnyRole(['contratacion', 'alcalde']);
     }
 
-    // Opcional: permiso via rol->permissions (para usar Gates/Policies)
+    // Permisos vía rol - para Gates/Policies avanzadas
     public function hasPermission(string $permission): bool
     {
         $this->loadMissing('role');

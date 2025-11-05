@@ -51,81 +51,76 @@
                 <i class="fas fa-user-tie"></i>
                 Datos de quien cobra
             </h5>
-
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="nombre_cobrador" class="form-label required">
                         <i class="fas fa-id-card"></i>Nombre completo
                     </label>
-                    <input type="text" 
-                           name="nombre_cobrador" 
-                           id="nombre_cobrador" 
-                           class="form-control @error('nombre_cobrador') is-invalid @enderror" 
-                           value="{{ old('nombre_cobrador') }}" 
+                    <input type="text"
+                           name="nombre_cobrador"
+                           id="nombre_cobrador"
+                           class="form-control @error('nombre_cobrador') is-invalid @enderror"
+                           value="{{ old('nombre_cobrador') }}"
                            placeholder="Ej: Juan Pérez García"
                            required>
                     @error('nombre_cobrador')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-6">
                     <label for="documento_cobrador" class="form-label required">
                         <i class="fas fa-fingerprint"></i>Número de documento
                     </label>
-                    <input type="text" 
-                           name="documento_cobrador" 
-                           id="documento_cobrador" 
-                           class="form-control @error('documento_cobrador') is-invalid @enderror" 
-                           value="{{ old('documento_cobrador') }}" 
+                    <input type="text"
+                           name="documento_cobrador"
+                           id="documento_cobrador"
+                           class="form-control @error('documento_cobrador') is-invalid @enderror"
+                           value="{{ old('documento_cobrador') }}"
                            placeholder="Ej: 1234567890"
                            required>
                     @error('documento_cobrador')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-12">
                     <label for="direccion_cobrador" class="form-label required">
                         <i class="fas fa-map-marker-alt"></i>Dirección
                     </label>
-                    <input type="text" 
-                           name="direccion_cobrador" 
-                           id="direccion_cobrador" 
-                           class="form-control @error('direccion_cobrador') is-invalid @enderror" 
-                           value="{{ old('direccion_cobrador') }}" 
+                    <input type="text"
+                           name="direccion_cobrador"
+                           id="direccion_cobrador"
+                           class="form-control @error('direccion_cobrador') is-invalid @enderror"
+                           value="{{ old('direccion_cobrador') }}"
                            placeholder="Ej: Calle 123 #45-67"
                            required>
                     @error('direccion_cobrador')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-6">
                     <label for="telefono_cobrador" class="form-label required">
                         <i class="fas fa-phone"></i>Teléfono
                     </label>
-                    <input type="text" 
-                           name="telefono_cobrador" 
-                           id="telefono_cobrador" 
-                           class="form-control @error('telefono_cobrador') is-invalid @enderror" 
-                           value="{{ old('telefono_cobrador') }}" 
+                    <input type="text"
+                           name="telefono_cobrador"
+                           id="telefono_cobrador"
+                           class="form-control @error('telefono_cobrador') is-invalid @enderror"
+                           value="{{ old('telefono_cobrador') }}"
                            placeholder="Ej: 3001234567"
                            required>
                     @error('telefono_cobrador')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-6">
                     <label for="email_cobrador" class="form-label required">
                         <i class="fas fa-envelope"></i>Correo electrónico
                     </label>
-                    <input type="email" 
-                           name="email_cobrador" 
-                           id="email_cobrador" 
-                           class="form-control @error('email_cobrador') is-invalid @enderror" 
-                           value="{{ old('email_cobrador') }}" 
+                    <input type="email"
+                           name="email_cobrador"
+                           id="email_cobrador"
+                           class="form-control @error('email_cobrador') is-invalid @enderror"
+                           value="{{ old('email_cobrador') }}"
                            placeholder="ejemplo@correo.com"
                            required>
                     @error('email_cobrador')
@@ -143,33 +138,31 @@
                 <i class="fas fa-building"></i>
                 Datos del cliente
             </h5>
-
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="nombre_cliente" class="form-label required">
                         <i class="fas fa-user"></i>Nombre / Razón social
                     </label>
-                    <input type="text" 
-                           name="nombre_cliente" 
-                           id="nombre_cliente" 
-                           class="form-control @error('nombre_cliente') is-invalid @enderror" 
-                           value="{{ old('nombre_cliente') }}" 
+                    <input type="text"
+                           name="nombre_cliente"
+                           id="nombre_cliente"
+                           class="form-control @error('nombre_cliente') is-invalid @enderror"
+                           value="{{ old('nombre_cliente') }}"
                            placeholder="Ej: Empresa ABC S.A.S."
                            required>
                     @error('nombre_cliente')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-6">
                     <label for="documento_cliente" class="form-label required">
                         <i class="fas fa-id-badge"></i>NIT o número de identificación
                     </label>
-                    <input type="text" 
-                           name="documento_cliente" 
-                           id="documento_cliente" 
-                           class="form-control @error('documento_cliente') is-invalid @enderror" 
-                           value="{{ old('documento_cliente') }}" 
+                    <input type="text"
+                           name="documento_cliente"
+                           id="documento_cliente"
+                           class="form-control @error('documento_cliente') is-invalid @enderror"
+                           value="{{ old('documento_cliente') }}"
                            placeholder="Ej: 900123456-7"
                            required>
                     @error('documento_cliente')
@@ -187,47 +180,45 @@
                 <i class="fas fa-file-invoice"></i>
                 Detalles de la Cuenta
             </h5>
-
             <div class="row g-3">
                 <div class="col-md-6">
                     <label for="monto" class="form-label required">
                         <i class="fas fa-dollar-sign"></i>Monto a cobrar
                     </label>
-                    <input type="number" 
-                           step="0.01" 
-                           name="monto" 
-                           id="monto" 
-                           class="form-control @error('monto') is-invalid @enderror" 
-                           value="{{ old('monto') }}" 
+                    <input type="number"
+                           step="0.01"
+                           min="1"
+                           name="monto"
+                           id="monto"
+                           class="form-control @error('monto') is-invalid @enderror"
+                           value="{{ old('monto') }}"
                            placeholder="Ej: 1000000.00"
                            required>
                     @error('monto')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-6">
                     <label for="fecha_emision" class="form-label required">
                         <i class="fas fa-calendar-alt"></i>Fecha de emisión
                     </label>
-                    <input type="date" 
-                           name="fecha_emision" 
-                           id="fecha_emision" 
-                           class="form-control @error('fecha_emision') is-invalid @enderror" 
-                           value="{{ old('fecha_emision') ?? now()->format('Y-m-d') }}"
+                    <input type="date"
+                           name="fecha_emision"
+                           id="fecha_emision"
+                           class="form-control @error('fecha_emision') is-invalid @enderror"
+                           value="{{ old('fecha_emision', now()->format('Y-m-d')) }}"
                            required>
                     @error('fecha_emision')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="col-md-12">
                     <label for="descripcion" class="form-label">
                         <i class="fas fa-align-left"></i>Descripción
                     </label>
-                    <textarea name="descripcion" 
-                              id="descripcion" 
-                              class="form-control @error('descripcion') is-invalid @enderror" 
+                    <textarea name="descripcion"
+                              id="descripcion"
+                              class="form-control @error('descripcion') is-invalid @enderror"
                               rows="4"
                               placeholder="Describa los servicios o productos facturados...">{{ old('descripcion') }}</textarea>
                     @error('descripcion')
@@ -259,7 +250,7 @@
     // Validación en tiempo real
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('formCrearCuenta');
-        
+
         // Formatear campo de teléfono (solo números)
         const telefonoInput = document.getElementById('telefono_cobrador');
         if(telefonoInput) {
@@ -280,7 +271,7 @@
         const montoInput = document.getElementById('monto');
         if(montoInput) {
             montoInput.addEventListener('input', function(e) {
-                if(this.value < 0) this.value = 0;
+                if(this.value < 1) this.value = 1;
             });
         }
 

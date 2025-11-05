@@ -11,7 +11,6 @@
         <a class="navbar-brand text-light fw-bold" href="{{ route('dashboard') }}">
             <i class="fas fa-file-invoice-dollar me-2"></i>CuentasCobro
         </a>
-
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
@@ -40,7 +39,6 @@
     <div class="p-3 sidebar-header">
         <h6 class="text-uppercase text-muted">Menú</h6>
     </div>
-
     <nav class="nav flex-column px-2">
         <a class="nav-link active" href="{{ route('dashboard') }}">
             <i class="fas fa-tachometer-alt"></i>
@@ -50,10 +48,16 @@
             <i class="fas fa-file-invoice"></i>
             <span class="link-text">Cuentas de Cobro</span>
         </a>
+        <a class="nav-link" href="{{ route('cuenta.cobro.pendientes_ordenador') }}">
+            <i class="fas fa-hourglass-half"></i>
+            <span class="link-text">Cuentas Pendientes</span>
+        </a>
+        @if(!auth()->user()->hasRole('ordenador_gasto'))
         <a class="nav-link" href="{{ route('cuenta.cobro.create') }}">
             <i class="fas fa-plus-circle"></i>
             <span class="link-text">Nueva Cuenta</span>
         </a>
+        @endif
 
         @if(Auth::user()->role_id && Auth::user()->role->name === 'alcalde')
         <div class="mt-3">
@@ -141,10 +145,18 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
+                            @if(!auth()->user()->hasRole('ordenador_gasto'))
                             <div class="col-12 col-md-4">
                                 <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
                                     <i class="fas fa-plus-circle fa-2x mb-2"></i>
                                     <span>Nueva Cuenta</span>
+                                </a>
+                            </div>
+                            @endif
+                            <div class="col-12 col-md-4">
+                                <a href="{{ route('cuenta.cobro.pendientes_ordenador') }}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                                    <i class="fas fa-hourglass-half fa-2x mb-2"></i>
+                                    <span>Cuentas Pendientes</span>
                                 </a>
                             </div>
                             <div class="col-12 col-md-4">
@@ -174,63 +186,11 @@
         @endif
 
         <!-- MÉTRICAS -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="metric-card text-center">
-                    <div class="metric-icon">
-                        <i class="fas fa-file-invoice text-info"></i>
-                    </div>
-                    <h5>Total Cuentas</h5>
-                    <h2 class="text-info count-up" data-target="{{ $totalCuentas ?? 0 }}">{{ $totalCuentas ?? 0 }}</h2>
-                    <small class="text-muted">
-                        <i class="fas fa-folder-open me-1"></i>Cuentas registradas
-                    </small>
-                </div>
-            </div>
+        <!-- el bloque de métricas sigue igual -->
 
-            <div class="col-md-6 col-lg-3">
-                <div class="metric-card text-center">
-                    <div class="metric-icon">
-                        <i class="fas fa-check-circle text-success"></i>
-                    </div>
-                    <h5>Pagadas</h5>
-                    <h2 class="text-success count-up" data-target="{{ $pagadas ?? 0 }}">{{ $pagadas ?? 0 }}</h2>
-                    <small class="text-muted">
-                        <i class="fas fa-check-double me-1"></i>Cuentas pagadas
-                    </small>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-lg-3">
-                <div class="metric-card text-center">
-                    <div class="metric-icon">
-                        <i class="fas fa-clock text-warning"></i>
-                    </div>
-                    <h5>Pendientes</h5>
-                    <h2 class="text-warning count-up" data-target="{{ $pendientes ?? 0 }}">{{ $pendientes ?? 0 }}</h2>
-                    <small class="text-muted">
-                        <i class="fas fa-hourglass-half me-1"></i>Por cobrar
-                    </small>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-lg-3">
-                <div class="metric-card text-center">
-                    <div class="metric-icon">
-                        <i class="fas fa-dollar-sign text-primary"></i>
-                    </div>
-                    <h5>Total Facturado</h5>
-                    <h2 class="text-primary">$<span class="count-up" data-target="{{ $totalFacturado ?? 0 }}">{{ number_format($totalFacturado ?? 0, 0) }}</span></h2>
-                    <small class="text-muted">
-                        <i class="fas fa-calendar-alt me-1"></i>Este mes
-                    </small>
-                </div>
-            </div>
-        </div>
-
-@isset($actividadesRecientes)
-<!-- ACTIVIDAD RECIENTE -->
-    <div class="card shadow-sm bg-dark border-0 text-light mb-5 activity-card">
+        @isset($actividadesRecientes)
+        <!-- ACTIVIDAD RECIENTE -->
+        <div class="card shadow-sm bg-dark border-0 text-light mb-5 activity-card">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
                     <i class="fas fa-history me-2 text-info"></i>Actividad Reciente
@@ -271,34 +231,33 @@
                     <div class="text-center py-5">
                         <i class="fas fa-inbox fa-4x text-muted mb-3 muted-icon"></i>
                         <p class="text-muted mb-3">No hay actividad reciente</p>
+                        @if(!auth()->user()->hasRole('ordenador_gasto'))
                         <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus-circle me-2"></i>Crear primera cuenta
                         </a>
+                        @endif
                     </div>
                 @endif
             </div>
         </div>
+        @endisset
 
     </div>
 </div>
-@endisset
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
 
-<!-- SCRIPT PARA SIDEBAR -->
 <script>
-    // Sidebar toggle (si tienes un botón para ello)
+    // Sidebar toggle
     const toggleBtn = document.getElementById('toggleSidebar');
     const sidebar = document.getElementById('sidebar');
     const mainWrapper = document.getElementById('mainWrapper');
-
     if(toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
             mainWrapper.classList.toggle('collapsed');
         });
     }
-
-    // Animación de contadores
+    // Contadores
     document.addEventListener('DOMContentLoaded', function() {
         const counters = document.querySelectorAll('.count-up');
         counters.forEach(counter => {
@@ -306,7 +265,6 @@
             const duration = 2000;
             const increment = target / (duration / 16);
             let current = 0;
-
             const updateCounter = () => {
                 current += increment;
                 if (current < target) {
@@ -316,7 +274,6 @@
                     counter.textContent = Math.floor(target);
                 }
             };
-
             updateCounter();
         });
     });

@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,7 +31,10 @@ return new class extends Migration
 
             // Estado y relación con el usuario
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            // Estados: pendiente, pendiente_ordenador, aprobada, rechazada, pagada
             $table->string('estado')->default('pendiente');
+            // Campo para observaciones/comentarios del ordenador de gasto o administrativo
+            $table->text('observaciones')->nullable();
 
             $table->timestamps();
         });

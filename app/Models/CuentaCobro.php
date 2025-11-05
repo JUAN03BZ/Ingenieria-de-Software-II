@@ -9,8 +9,10 @@ class CuentaCobro extends Model
 {
     use HasFactory;
 
+    // Nombre exacto de la tabla
     protected $table = 'cuentas_cobro';
 
+    // Campos que pueden ser asignados masivamente
     protected $fillable = [
         'nombre_cobrador',
         'documento_cobrador',
@@ -24,5 +26,12 @@ class CuentaCobro extends Model
         'fecha_emision',
         'user_id',
         'estado',
+        'observaciones'
     ];
+
+    // Relación con usuario
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

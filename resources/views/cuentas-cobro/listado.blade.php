@@ -19,9 +19,11 @@
                         <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
                         </a>
+                        @if(!auth()->user()->hasRole('ordenador_gasto'))
                         <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus-circle me-2"></i>Nueva Cuenta
                         </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -56,9 +58,11 @@
                         </div>
                         <h4 style="color: #94a3b8; font-weight: 600;">No hay cuentas de cobro</h4>
                         <p class="text-muted mb-4">Comienza creando tu primera cuenta de cobro</p>
+                        @if(!auth()->user()->hasRole('ordenador_gasto'))
                         <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary btn-lg">
                             <i class="fas fa-plus-circle me-2"></i>Crear Primera Cuenta
                         </a>
+                        @endif
                     </div>
                 @else
                     <!-- TABLA DE CUENTAS -->
@@ -115,38 +119,44 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-{{ $cuenta->estado === 'pendiente' ? 'warning' : ($cuenta->estado === 'pagada' ? 'success' : 'secondary') }}">
-                                                <i class="fas {{ $cuenta->estado === 'pagada' ? 'fa-check-circle' : ($cuenta->estado === 'pendiente' ? 'fa-clock' : 'fa-times-circle') }} me-1"></i>
+                                            <span class="badge bg-{{ $cuenta->estado === 'pendiente' ? 'warning' : ($cuenta->estado === 'pagada' ? 'success' : ($cuenta->estado === 'pendiente_ordenador' ? 'info' : 'secondary')) }}">
+                                                <i class="fas {{ $cuenta->estado === 'pagada' ? 'fa-check-circle' : ($cuenta->estado === 'pendiente' ? 'fa-clock' : ($cuenta->estado === 'pendiente_ordenador' ? 'fa-user-check' : 'fa-times-circle')) }} me-1"></i>
                                                 {{ ucfirst($cuenta->estado) }}
                                             </span>
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="{{ route('cuenta.cobro.create') }}" 
-                                                   class="btn btn-sm btn-info" 
-                                                   title="Ver detalles"
-                                                   data-bs-toggle="tooltip">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ route('cuenta.cobro.create') }}" 
-                                                   class="btn btn-sm btn-primary" 
-                                                   title="Editar"
-                                                   data-bs-toggle="tooltip">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route('cuenta.cobro.create') }}" 
-                                                      method="POST" 
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('¿Está seguro de eliminar esta cuenta de cobro?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" 
-                                                            class="btn btn-sm btn-danger" 
-                                                            title="Eliminar"
-                                                            data-bs-toggle="tooltip">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                @if(auth()->user()->hasRole('ordenador_gasto'))
+                                                    <a href="{{ route('cuenta.cobro.show', $cuenta->id) }}" 
+                                                        class="btn btn-sm btn-info" 
+                                                        title="Ver detalles"
+                                                        data-bs-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    @if($cuenta->estado === 'pendiente_ordenador')
+                                                        <form action="{{ route('cuenta.cobro.aprobar', $cuenta->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm" title="Aprobar">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('cuenta.cobro.rechazar', $cuenta->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <input type="text" name="observaciones" placeholder="Motivo del rechazo" required class="form-control d-inline" style="width:120px;">
+                                                            <button type="submit" class="btn btn-danger btn-sm" title="Rechazar">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                @else
+                                                    <a href="{{ route('cuenta.cobro.show', $cuenta->id) }}" 
+                                                        class="btn btn-sm btn-info" 
+                                                        title="Ver detalles"
+                                                        data-bs-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    {{-- Aquí podrías agregar Editar/Eliminar para otros roles si lo necesitas --}}
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -154,8 +164,7 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- PAGINACIÓN (si la implementas) -->
+                    <!-- PAGINACIÓN -->
                     @if(method_exists($cuentas, 'links'))
                         <div class="mt-4">
                             {{ $cuentas->links() }}
