@@ -5,20 +5,15 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar (opcional) -->
-        <div class="col-md-2">
-            <!-- Sidebar content -->
-        </div>
-        
         <!-- Main content -->
-        <div class="col-md-10">
+        <div class="col-md-12">
             <!-- Header con navegación -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="{{ route('roles.index') }}" class="text-decoration-none">
+                                <a href="{{ route('roles.index') }}">
                                     <i class="fas fa-users-cog me-1"></i>Roles
                                 </a>
                             </li>
@@ -26,15 +21,14 @@
                         </ol>
                     </nav>
                     <h2 class="fw-bold text-dark mb-0">
-                        <i class="fas fa-plus-circle text-primary me-2"></i>
+                        <i class="fas fa-plus-circle me-2" style="color: #3b82f6;"></i>
                         Crear Nuevo Rol
                     </h2>
                 </div>
                 
                 <div class="btn-group" role="group">
                     <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i>
-                        Cancelar
+                        <i class="fas fa-arrow-left me-2"></i>Cancelar
                     </a>
                 </div>
             </div>
@@ -69,7 +63,7 @@
                             <div class="card-body">
                                 <!-- Nombre del rol -->
                                 <div class="mb-3">
-                                    <label for="name" class="form-label fw-bold">
+                                    <label for="name" class="form-label">
                                         <i class="fas fa-tag me-1"></i>
                                         Nombre del Rol <span class="text-danger">*</span>
                                     </label>
@@ -91,7 +85,7 @@
 
                                 <!-- Descripción del rol -->
                                 <div class="mb-3">
-                                    <label for="description" class="form-label fw-bold">
+                                    <label for="description" class="form-label">
                                         <i class="fas fa-align-left me-1"></i>
                                         Descripción <span class="text-danger">*</span>
                                     </label>
@@ -114,7 +108,7 @@
                                 <div class="mb-3">
                                     <div class="card bg-light">
                                         <div class="card-body py-2">
-                                            <h6 class="mb-1">
+                                            <h6 class="mb-1" style="color: #3b82f6;">
                                                 <i class="fas fa-chart-pie me-1"></i>
                                                 Resumen de Permisos
                                             </h6>
@@ -136,17 +130,17 @@
                     <!-- Permisos disponibles -->
                     <div class="col-lg-8 mb-4">
                         <div class="card shadow">
-                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <h5 class="mb-0">
                                     <i class="fas fa-key me-2"></i>
                                     Asignar Permisos
                                 </h5>
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-light btn-sm" onclick="selectAllPermissions()">
+                                    <button type="button" class="btn btn-light" onclick="selectAllPermissions()">
                                         <i class="fas fa-check-square me-1"></i>
                                         Seleccionar Todo
                                     </button>
-                                    <button type="button" class="btn btn-outline-light btn-sm" onclick="clearAllPermissions()">
+                                    <button type="button" class="btn btn-outline-light" onclick="clearAllPermissions()">
                                         <i class="fas fa-square me-1"></i>
                                         Limpiar Todo
                                     </button>
@@ -212,7 +206,7 @@
                                     <div class="col-md-6 mb-4">
                                         <div class="border rounded p-3 h-100">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <h6 class="fw-bold text-primary mb-0">
+                                                <h6 class="mb-0">
                                                     @switch($category)
                                                         @case('Cuentas de Cobro')
                                                             <i class="fas fa-file-invoice me-1"></i>
@@ -275,18 +269,18 @@
                     <div class="col-12">
                         <div class="card shadow">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                                     <div class="text-muted">
                                         <i class="fas fa-info-circle me-1"></i>
                                         Los campos marcados con <span class="text-danger">*</span> son obligatorios
                                     </div>
                                     <div class="btn-group" role="group">
                                         <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary">
-                                            <i class="fas fa-times me-1"></i>
+                                            <i class="fas fa-times me-2"></i>
                                             Cancelar
                                         </a>
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save me-1"></i>
+                                            <i class="fas fa-save me-2"></i>
                                             Crear Rol
                                         </button>
                                     </div>
@@ -299,36 +293,15 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('styles')
-<style>
-    .card {
-        border: none;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-    
-    .form-check-input:checked {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-    }
-    
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: ">";
-    }
-    
-    .permission-checkbox {
-        cursor: pointer;
-    }
-    
-    .form-check-label {
-        cursor: pointer;
-    }
-</style>
+    <link rel="stylesheet" href="{{ asset('css/crear-rol.css') }}">
 @endpush
 
 @push('scripts')
 <script>
-    // Auto-ocultar alertas después de 5 segundos (sin jQuery)
+    // Auto-ocultar alertas después de 5 segundos
     setTimeout(function () {
         document.querySelectorAll('.alert').forEach(function (el) {
             el.style.transition = 'opacity 0.5s ease';
@@ -407,4 +380,3 @@
     });
 </script>
 @endpush
-@endsection
