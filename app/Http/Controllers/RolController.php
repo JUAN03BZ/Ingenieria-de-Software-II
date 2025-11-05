@@ -11,16 +11,14 @@ class RolController extends Controller
 {
     public function __construct()
     {
-        // Asegura usuario autenticado antes de cualquier acción
         $this->middleware('auth');
     }
 
-    // Helpers internos para evitar depender de métodos inexistentes en User
     private function currentUser(): ?User
     {
         $user = Auth::user();
         if ($user) {
-            $user->loadMissing('role'); // requiere belongsTo('role') en User
+            $user->loadMissing('role');
         }
         return $user;
     }
@@ -28,28 +26,17 @@ class RolController extends Controller
     private function userHasRole(string|array $roles): bool
     {
         $user = $this->currentUser();
-        if (!$user || !$user->role) {
-            return false;
-        }
+        if (!$user || !$user->role) return false;
         $roles = (array) $roles;
         return in_array($user->role->name, $roles, true);
     }
 
-    private function isAdmin(): bool
-    {
-        // Define “admin” como rol alcalde para este módulo
-        return $this->userHasRole('alcalde');
-    }
-
     public function index()
     {
-        if (!$this->isAdmin()) {
+        if (!$this->userHasRole('alcalde')) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para acceder a esta sección.');
         }
-
-        // Requiere que el modelo Roles tenga la relación users(): hasMany(User::class, 'role_id')
         $roles = Roles::withCount('users')->get();
-
         return view('roles.index', compact('roles'));
     }
 
@@ -58,7 +45,6 @@ class RolController extends Controller
         if (!$this->userHasRole('alcalde')) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para crear roles.');
         }
-
         $availablePermissions = $this->getAvailablePermissions();
         return view('roles.create', compact('availablePermissions'));
     }
@@ -68,31 +54,26 @@ class RolController extends Controller
         if (!$this->userHasRole('alcalde')) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para crear roles.');
         }
-
         $request->validate([
             'name'        => 'required|string|max:255|unique:roles,name|regex:/^[a-z_]+$/',
             'description' => 'required|string|max:500',
             'permissions' => 'array'
         ]);
-
         $role = Roles::create([
             'name'        => $request->name,
             'description' => $request->description,
             'permissions' => $request->permissions ?? [],
         ]);
-
         return redirect()->route('roles.index')->with('success', 'Rol creado exitosamente.');
     }
 
     public function show(Roles $role)
     {
-        if (!$this->isAdmin()) {
+        if (!$this->userHasRole('alcalde')) {
             return redirect('/dashboard')->with('error', 'No tienes permisos para ver esta información.');
         }
-
-        $users = $role->users()->paginate(10); // requiere users() en Roles
+        $users = $role->users()->paginate(10);
         $availablePermissions = $this->getAvailablePermissions();
-
         return view('roles.show', compact('role', 'users', 'availablePermissions'));
     }
 
@@ -101,7 +82,6 @@ class RolController extends Controller
         if (!$this->userHasRole('alcalde')) {
             return redirect()->route('roles.index')->with('error', 'No tienes permisos para editar roles.');
         }
-
         return view('roles.edit', compact('role'));
     }
 
@@ -110,11 +90,8 @@ class RolController extends Controller
         if (!$this->userHasRole('alcalde')) {
             return redirect()->route('roles.index')->with('error', 'No tienes permisos para actualizar roles.');
         }
-
         $isSystemRole = in_array($role->name, ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion'], true);
-
         $rules = ['permissions' => 'array'];
-
         if (!$isSystemRole) {
             $rules = array_merge($rules, [
                 'name'        => 'required|string|max:255|regex:/^[a-z_]+$/|unique:roles,name,' . $role->id,
@@ -126,9 +103,7 @@ class RolController extends Controller
                 'description' => 'required|string',
             ]);
         }
-
         $validated = $request->validate($rules);
-
         if ($isSystemRole) {
             $role->permissions = $request->input('permissions', []);
         } else {
@@ -136,9 +111,7 @@ class RolController extends Controller
             $role->description = $request->input('description');
             $role->permissions = $request->input('permissions', []);
         }
-
         $role->save();
-
         return redirect()->route('roles.show', $role->id)->with('success', 'Rol actualizado correctamente.');
     }
 
@@ -147,17 +120,13 @@ class RolController extends Controller
         if (!$this->userHasRole('alcalde')) {
             return redirect()->route('roles.index')->with('error', 'No tienes permisos para eliminar roles.');
         }
-
         if (in_array($role->name, ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion'], true)) {
             return redirect()->route('roles.index')->with('error', 'No se pueden eliminar roles del sistema.');
         }
-
         if ($role->users()->count() > 0) {
             return redirect()->route('roles.index')->with('error', 'No se puede eliminar un rol con usuarios asignados.');
         }
-
         $role->delete();
-
         return redirect()->route('roles.index')->with('success', 'Rol eliminado correctamente.');
     }
 
@@ -166,16 +135,13 @@ class RolController extends Controller
         if (!$this->userHasRole(['alcalde', 'contratacion'])) {
             return response()->json(['success' => false, 'error' => 'No autorizado'], 403);
         }
-
         $data = $request->validate([
             'user_id' => 'required|exists:users,id',
             'role_id' => 'required|exists:roles,id',
         ]);
-
         $user = User::find($data['user_id']);
         $user->role_id = $data['role_id'];
         $user->save();
-
         return response()->json(['success' => true]);
     }
 
@@ -184,25 +150,20 @@ class RolController extends Controller
         if (!$this->userHasRole(['alcalde', 'contratacion'])) {
             return response()->json(['success' => false, 'error' => 'No autorizado'], 403);
         }
-
         $data = $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
-
         $user = User::find($data['user_id']);
         $user->role_id = null;
         $user->save();
-
         return response()->json(['success' => true]);
     }
 
-    // NUEVOS: aprobación y asignación de roles por admin
     public function usuariosPendientes()
     {
         if (!$this->userHasRole('alcalde')) {
             abort(403);
         }
-
         $usuarios = User::where('is_approved', false)->orderBy('created_at', 'desc')->paginate(15);
         $roles = Roles::orderBy('name')->get(['id', 'name']);
         return view('usuarios.pendientes', compact('usuarios', 'roles'));
@@ -213,11 +174,9 @@ class RolController extends Controller
         if (!$this->userHasRole('alcalde')) {
             abort(403);
         }
-
         $usuario->is_approved = true;
         $usuario->approved_at = now();
         $usuario->save();
-
         return back()->with('success', 'Usuario aprobado correctamente.');
     }
 
@@ -226,14 +185,11 @@ class RolController extends Controller
         if (!$this->userHasRole('alcalde')) {
             abort(403);
         }
-
         $data = $request->validate([
             'role_id' => 'required|exists:roles,id',
         ]);
-
         $usuario->role_id = $data['role_id'];
         $usuario->save();
-
         return back()->with('success', 'Rol asignado correctamente.');
     }
 

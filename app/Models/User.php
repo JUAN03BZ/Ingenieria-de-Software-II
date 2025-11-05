@@ -8,7 +8,6 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = ['name', 'email', 'password', 'role_id'];
@@ -23,21 +22,20 @@ class User extends Authenticatable
         ];
     }
 
-    // Relación con Roles (FK role_id)
+    // Relación con Roles
     public function role()
     {
-        return $this->belongsTo(Roles::class, 'role_id');
-        // Si tu modelo es singular usa Role::class
+        return $this->belongsTo(Roles::class, 'role_id'); // Si el modelo es "Role", usa Role::class
     }
 
-    // Nombre del rol (seguro)
+    // Nombre del rol
     public function getRoleName(): string
     {
         $this->loadMissing('role');
         return $this->role ? $this->role->name : 'Sin rol';
     }
 
-    // ¿Tiene alguno de los roles dados?
+    // ¿Tiene alguno de los roles dados? (array o string)
     public function hasAnyRole(string|array $roles): bool
     {
         $this->loadMissing('role');
@@ -48,7 +46,7 @@ class User extends Authenticatable
         return in_array($this->role->name, $roles, true);
     }
 
-    // Alias: ¿tiene el rol exacto?
+    // ¿Tiene el rol exacto? (alias)
     public function hasRole(string|array $roles): bool
     {
         return $this->hasAnyRole($roles);
@@ -90,7 +88,7 @@ class User extends Authenticatable
         return $this->hasAnyRole(['contratacion', 'alcalde']);
     }
 
-    // Permisos vía rol - para Gates/Policies avanzadas
+    // Permisos por rol (para Gates/Policies avanzadas)
     public function hasPermission(string $permission): bool
     {
         $this->loadMissing('role');

@@ -13,10 +13,17 @@
                                 <i class="fas fa-arrow-left me-1"></i>
                                 Menú
                             </a>
+                            {{-- SOLO Ordenador de gasto ve el botón de pendientes --}}
+                            @if(auth()->user()->hasRole('ordenador_gasto'))
+                                <a href="{{ route('cuenta.cobro.pendientes') }}" class="btn btn-warning">
+                                    Cuentas Pendientes
+                                </a>
+                            @endif
+                            {{-- Sólo los que NO son ordenador pueden crear cuentas --}}
                             @if(!auth()->user()->hasRole('ordenador_gasto'))
-                            <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary">
-                                Crear Nueva Cuenta de Cobro
-                            </a>
+                                <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary">
+                                    Crear Nueva Cuenta de Cobro
+                                </a>
                             @endif
                         </div>
                     </div>

@@ -31,7 +31,7 @@ class AuthController extends Controller
 
             if (!$user->is_approved) {
                 Auth::logout();
-                return back()->with('error', 'Tu cuenta está pendiente de aprobación.'); // flash
+                return back()->with('error', 'Tu cuenta está pendiente de aprobación.');
             }
 
             return redirect()->intended(route('dashboard'));
@@ -53,7 +53,11 @@ class AuthController extends Controller
             ->where('fecha_emision', '>=', now()->startOfMonth())
             ->sum('monto');
 
-        $actividadesRecientes = $cuentas->sortByDesc('created_at')->take(5);
+        // Solo actividades recientes APROBADAS
+        $actividadesRecientes = $cuentas
+            ->where('estado', 'aprobada')
+            ->sortByDesc('updated_at')
+            ->take(5);
 
         return view('dashboard', compact('totalCuentas', 'pagadas', 'pendientes', 'totalFacturado', 'actividadesRecientes'));
     }
@@ -64,7 +68,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect('/login');
     }
 }

@@ -18,8 +18,16 @@
                         <i class="fas fa-user-circle me-2"></i>{{ Auth::user()->name }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end bg-dark text-light dropdown-custom">
-                        <li><a class="dropdown-item text-light" href="#"><i class="fas fa-user-cog me-2"></i>Perfil</a></li>
-                        <li><a class="dropdown-item text-light" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                        <li>
+                            <a class="dropdown-item text-light" href="#">
+                                <i class="fas fa-user-cog me-2"></i>Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-light" href="#">
+                                <i class="fas fa-cog me-2"></i>Configuración
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider bg-secondary"></li>
                         <li>
                             <a class="dropdown-item text-light" href="{{ route('logout') }}" 
@@ -48,11 +56,11 @@
             <i class="fas fa-file-invoice"></i>
             <span class="link-text">Cuentas de Cobro</span>
         </a>
-        <a class="nav-link" href="{{ route('cuenta.cobro.pendientes_ordenador') }}">
+        <a class="nav-link" href="{{ route('cuenta.cobro.pendientes') }}">
             <i class="fas fa-hourglass-half"></i>
             <span class="link-text">Cuentas Pendientes</span>
         </a>
-        @if(!auth()->user()->hasRole('ordenador_gasto'))
+        @if(!auth()->user()->hasRole('ordenador_gasto') && !auth()->user()->hasRole('supervisor'))
         <a class="nav-link" href="{{ route('cuenta.cobro.create') }}">
             <i class="fas fa-plus-circle"></i>
             <span class="link-text">Nueva Cuenta</span>
@@ -145,7 +153,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            @if(!auth()->user()->hasRole('ordenador_gasto'))
+                            @if(!auth()->user()->hasRole('ordenador_gasto') && !auth()->user()->hasRole('supervisor'))
                             <div class="col-12 col-md-4">
                                 <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
                                     <i class="fas fa-plus-circle fa-2x mb-2"></i>
@@ -154,7 +162,7 @@
                             </div>
                             @endif
                             <div class="col-12 col-md-4">
-                                <a href="{{ route('cuenta.cobro.pendientes_ordenador') }}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
+                                <a href="{{ route('cuenta.cobro.pendientes') }}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
                                     <i class="fas fa-hourglass-half fa-2x mb-2"></i>
                                     <span>Cuentas Pendientes</span>
                                 </a>
@@ -177,7 +185,6 @@
             </div>
         </div>
 
-        <!-- ALERTA DE ÉXITO -->
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
                 <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
@@ -185,11 +192,7 @@
             </div>
         @endif
 
-        <!-- MÉTRICAS -->
-        <!-- el bloque de métricas sigue igual -->
-
         @isset($actividadesRecientes)
-        <!-- ACTIVIDAD RECIENTE -->
         <div class="card shadow-sm bg-dark border-0 text-light mb-5 activity-card">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
@@ -219,8 +222,14 @@
                                             ${{ number_format($cuenta->monto, 2) }}
                                         </span>
                                     </div>
-                                    <span class="badge {{ $cuenta->estado == 'pagada' ? 'bg-success' : ($cuenta->estado == 'pendiente' ? 'bg-warning text-dark' : 'bg-secondary') }}">
-                                        <i class="fas {{ $cuenta->estado == 'pagada' ? 'fa-check' : 'fa-clock' }} me-1"></i>
+                                    <!-- Cambia la clase según el estado -->
+                                    <span class="badge 
+                                        @if($cuenta->estado == 'pagada') bg-success 
+                                        @elseif($cuenta->estado == 'pendiente') bg-warning text-dark
+                                        @else bg-secondary @endif">
+                                        <i class="fas 
+                                            @if($cuenta->estado == 'pagada') fa-check 
+                                            @else fa-clock @endif me-1"></i>
                                         {{ ucfirst($cuenta->estado) }}
                                     </span>
                                 </div>
@@ -231,7 +240,7 @@
                     <div class="text-center py-5">
                         <i class="fas fa-inbox fa-4x text-muted mb-3 muted-icon"></i>
                         <p class="text-muted mb-3">No hay actividad reciente</p>
-                        @if(!auth()->user()->hasRole('ordenador_gasto'))
+                        @if(!auth()->user()->hasRole('ordenador_gasto') && !auth()->user()->hasRole('supervisor'))
                         <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus-circle me-2"></i>Crear primera cuenta
                         </a>

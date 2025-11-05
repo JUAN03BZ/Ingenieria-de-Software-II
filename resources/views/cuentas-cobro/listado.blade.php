@@ -20,9 +20,9 @@
                             <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
                         </a>
                         @if(!auth()->user()->hasRole('ordenador_gasto'))
-                        <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus-circle me-2"></i>Nueva Cuenta
-                        </a>
+                            <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle me-2"></i>Nueva Cuenta
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -59,9 +59,9 @@
                         <h4 style="color: #94a3b8; font-weight: 600;">No hay cuentas de cobro</h4>
                         <p class="text-muted mb-4">Comienza creando tu primera cuenta de cobro</p>
                         @if(!auth()->user()->hasRole('ordenador_gasto'))
-                        <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-plus-circle me-2"></i>Crear Primera Cuenta
-                        </a>
+                            <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus-circle me-2"></i>Crear Primera Cuenta
+                            </a>
                         @endif
                     </div>
                 @else
@@ -126,36 +126,26 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                @if(auth()->user()->hasRole('ordenador_gasto'))
-                                                    <a href="{{ route('cuenta.cobro.show', $cuenta->id) }}" 
-                                                        class="btn btn-sm btn-info" 
-                                                        title="Ver detalles"
+                                                <a href="{{ route('cuenta.cobro.show', $cuenta->id) }}" 
+                                                    class="btn btn-sm btn-info" 
+                                                    title="Ver detalles"
+                                                    data-bs-toggle="tooltip">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                @if(auth()->user()->isAlcalde() || auth()->user()->id == $cuenta->user_id)
+                                                    <a href="{{ route('cuenta.cobro.edit', $cuenta->id) }}" 
+                                                        class="btn btn-sm btn-warning" 
+                                                        title="Editar"
                                                         data-bs-toggle="tooltip">
-                                                        <i class="fas fa-eye"></i>
+                                                        <i class="fas fa-edit"></i>
                                                     </a>
-                                                    @if($cuenta->estado === 'pendiente_ordenador')
-                                                        <form action="{{ route('cuenta.cobro.aprobar', $cuenta->id) }}" method="POST" class="d-inline">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-success btn-sm" title="Aprobar">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </form>
-                                                        <form action="{{ route('cuenta.cobro.rechazar', $cuenta->id) }}" method="POST" class="d-inline">
-                                                            @csrf
-                                                            <input type="text" name="observaciones" placeholder="Motivo del rechazo" required class="form-control d-inline" style="width:120px;">
-                                                            <button type="submit" class="btn btn-danger btn-sm" title="Rechazar">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                @else
-                                                    <a href="{{ route('cuenta.cobro.show', $cuenta->id) }}" 
-                                                        class="btn btn-sm btn-info" 
-                                                        title="Ver detalles"
-                                                        data-bs-toggle="tooltip">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    {{-- Aquí podrías agregar Editar/Eliminar para otros roles si lo necesitas --}}
+                                                    <form action="{{ route('cuenta.cobro.destroy', $cuenta->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta cuenta?')">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
                                                 @endif
                                             </div>
                                         </td>

@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cuentas_cobro', function (Blueprint $table) {
-            $table->text('observaciones')->nullable()->after('estado');
-        });
+        // Solo agrega la columna si NO existe
+        if (!Schema::hasColumn('cuentas_cobro', 'observaciones')) {
+            Schema::table('cuentas_cobro', function (Blueprint $table) {
+                $table->text('observaciones')->nullable()->after('estado');
+            });
+        }
     }
 
     /**
@@ -20,8 +24,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cuentas_cobro', function (Blueprint $table) {
-            $table->dropColumn('observaciones');
-        });
+        // Solo elimina si existe
+        if (Schema::hasColumn('cuentas_cobro', 'observaciones')) {
+            Schema::table('cuentas_cobro', function (Blueprint $table) {
+                $table->dropColumn('observaciones');
+            });
+        }
     }
 };
+    
