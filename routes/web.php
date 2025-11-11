@@ -32,9 +32,11 @@ Route::middleware(['auth'])->group(function () {
     // CRUD Cuentas de Cobro
     Route::get('/cuentas-cobro', [CuentaCobroController::class, 'index'])->name('cuenta.cobro.index');
     Route::get('/cuentas-cobro/pendientes', [CuentaCobroController::class, 'pendientes'])->name('cuenta.cobro.pendientes');
+
     Route::get('/cuenta-cobro/create', [CuentaCobroController::class, 'create'])
         ->name('cuenta.cobro.create')
         ->middleware('role:alcalde,contratista');
+
     Route::post('/cuenta-cobro/guardar', [CuentaCobroController::class, 'store'])
         ->name('cuenta.cobro.guardar')
         ->middleware('role:alcalde,contratista');
@@ -49,23 +51,29 @@ Route::middleware(['auth'])->group(function () {
         ->name('cuenta.cobro.cambiar.estado')
         ->middleware('role:alcalde,contratista');
 
-    // Rutas de roles y usuarios pendientes (admin solo alcalde)
+    // Gestión de roles (vista índice y detalle visibles para autenticados)
+    Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
+    Route::get('/roles/{role}', [RolController::class, 'show'])->name('roles.show');
+
+    // Rutas admin (solo alcalde) con prefijo y nombre admin.
     Route::middleware('role:alcalde')->prefix('admin')->name('admin.')->group(function () {
+        // Usuarios pendientes y acciones
         Route::get('/usuarios/pendientes', [RolController::class, 'usuariosPendientes'])->name('usuarios.pendientes');
         Route::post('/usuarios/{usuario}/aprobar', [RolController::class, 'aprobarUsuario'])->name('usuarios.aprobar');
         Route::post('/usuarios/{usuario}/asignar-rol', [RolController::class, 'asignarRol'])->name('usuarios.asignar-rol');
+
+        // CRUD de roles (crear/guardar/editar/actualizar/eliminar)
         Route::get('/roles/create', [RolController::class, 'create'])->name('roles.create');
         Route::post('/roles', [RolController::class, 'store'])->name('roles.store');
         Route::get('/roles/{role}/edit', [RolController::class, 'edit'])->name('roles.edit');
         Route::put('/roles/{role}', [RolController::class, 'update'])->name('roles.update');
         Route::delete('/roles/{role}', [RolController::class, 'destroy'])->name('roles.destroy');
     });
-
-    Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
-    Route::get('/roles/{role}', [RolController::class, 'show'])->name('roles.show');
 });
 
 // Reportes para 'alcalde' y 'ordenador_gasto'
-Route::middleware(['auth', 'role:alcalde,ordenador_gasto'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/reports', fn () => view('admin.reports'))->name('reports');
-});
+Route::middleware(['auth', 'role:alcalde,ordenador_gasto'])
+    ->prefix('admin')->name('admin.')
+    ->group(function () {
+        Route::get('/reports', fn () => view('admin.reports'))->name('reports');
+    });

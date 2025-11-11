@@ -28,7 +28,7 @@
                         <i class="fas fa-arrow-left me-2"></i>Volver
                     </a>
                     @if($canManageRoles)
-                    <a href="{{ route('roles.create') }}" class="btn btn-primary">
+                    <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>Nuevo Rol
                     </a>
                     @endif
@@ -170,26 +170,13 @@
                                     <td>
                                         <strong class="text-capitalize" style="color: #ffffff;">
                                             @switch($role->name)
-                                                @case('contratista')
-                                                    <i class="fas fa-user-tie me-1"></i>
-                                                    @break
-                                                @case('supervisor')
-                                                    <i class="fas fa-user-check me-1"></i>
-                                                    @break
-                                                @case('alcalde')
-                                                    <i class="fas fa-crown me-1"></i>
-                                                    @break
-                                                @case('ordenador_gasto')
-                                                    <i class="fas fa-money-check-alt me-1"></i>
-                                                    @break
-                                                @case('tesoreria')
-                                                    <i class="fas fa-coins me-1"></i>
-                                                    @break
-                                                @case('contratacion')
-                                                    <i class="fas fa-handshake me-1"></i>
-                                                    @break
-                                                @default
-                                                    <i class="fas fa-user me-1"></i>
+                                                @case('contratista') <i class="fas fa-user-tie me-1"></i> @break
+                                                @case('supervisor') <i class="fas fa-user-check me-1"></i> @break
+                                                @case('alcalde') <i class="fas fa-crown me-1"></i> @break
+                                                @case('ordenador_gasto') <i class="fas fa-money-check-alt me-1"></i> @break
+                                                @case('tesoreria') <i class="fas fa-coins me-1"></i> @break
+                                                @case('contratacion') <i class="fas fa-handshake me-1"></i> @break
+                                                @default <i class="fas fa-user me-1"></i>
                                             @endswitch
                                             {{ ucfirst(str_replace('_', ' ', $role->name)) }}
                                         </strong>
@@ -243,7 +230,7 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
 
-                                            <a href="{{ route('roles.edit', $role->id) }}" 
+                                            <a href="{{ route('admin.roles.edit', $role->id) }}" 
                                                class="btn btn-outline-warning" 
                                                title="Editar"
                                                data-bs-toggle="tooltip">
@@ -254,7 +241,7 @@
                                                 $sistema = ['contratista', 'supervisor', 'alcalde', 'ordenador_gasto', 'tesoreria', 'contratacion'];
                                             @endphp
                                             @if(!in_array($role->name, $sistema, true) && $role->users_count == 0)
-                                            <form action="{{ route('roles.destroy', $role->id) }}" 
+                                            <form action="{{ route('admin.roles.destroy', $role->id) }}" 
                                                   method="POST" 
                                                   class="d-inline" 
                                                   onsubmit="return confirm('¿Estás seguro de eliminar este rol? Esta acción no se puede deshacer.')">
@@ -310,7 +297,7 @@
                         <h4>No hay roles registrados</h4>
                         <p class="mb-4">Comienza creando el primer rol del sistema.</p>
                         @if($canManageRoles)
-                        <a href="{{ route('roles.create') }}" class="btn btn-primary btn-lg">
+                        <a href="{{ route('admin.roles.create') }}" class="btn btn-primary btn-lg">
                             <i class="fas fa-plus me-2"></i>Crear Primer Rol
                         </a>
                         @endif
