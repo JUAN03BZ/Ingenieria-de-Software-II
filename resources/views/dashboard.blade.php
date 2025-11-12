@@ -81,10 +81,12 @@
         </div>
         @endif
 
+        @if(!auth()->user()->hasRole('contratista'))
         <a class="nav-link" href="#">
             <i class="fas fa-chart-line"></i>
             <span class="link-text">Reportes</span>
         </a>
+        @endif
         <a class="nav-link" href="#">
             <i class="fas fa-cog"></i>
             <span class="link-text">Configuración</span>
@@ -173,12 +175,14 @@
                                     <span>Ver Todas</span>
                                 </a>
                             </div>
+                            @if(!auth()->user()->hasRole('contratista'))
                             <div class="col-12 col-md-4">
                                 <a href="#" class="btn btn-outline-light w-100 d-flex flex-column align-items-center py-3">
                                     <i class="fas fa-chart-line fa-2x mb-2"></i>
                                     <span>Reportes</span>
                                 </a>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -204,15 +208,22 @@
                 @if($actividadesRecientes->count() > 0)
                     <ul class="list-group list-group-flush bg-transparent">
                         @foreach($actividadesRecientes as $cuenta)
+                            @php
+                                $creador = $cuenta->user ?? null;
+                                $rolCreador = $creador?->role?->name ? ucfirst(str_replace('_',' ', $creador->role->name)) : 'Sin rol';
+                            @endphp
                             <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center mb-2 activity-item">
                                 <div>
                                     <div class="d-flex align-items-center mb-1">
                                         <span class="badge bg-secondary me-2">#{{ $cuenta->id }}</span>
                                         <strong>{{ $cuenta->descripcion ?? 'Sin descripción' }}</strong>
+                                        <span class="badge bg-light text-dark ms-2" title="Rol del creador">
+                                            <i class="fas fa-user-tag me-1"></i>{{ $rolCreador }}
+                                        </span>
                                     </div>
                                     <small class="text-info">
                                         <i class="fas fa-calendar me-1"></i>
-                                        {{ $cuenta->fecha_emision ? date('d/m/Y', strtotime($cuenta->fecha_emision)) : 'Sin fecha' }}
+                                        {{ optional($cuenta->updated_at)->format('d/m/Y H:i') ?? ($cuenta->fecha_emision ? date('d/m/Y', strtotime($cuenta->fecha_emision)) : 'Sin fecha') }}
                                     </small>
                                 </div>
                                 <div class="text-end">
@@ -222,15 +233,16 @@
                                             ${{ number_format($cuenta->monto, 2) }}
                                         </span>
                                     </div>
-                                    <!-- Cambia la clase según el estado -->
                                     <span class="badge 
                                         @if($cuenta->estado == 'pagada') bg-success 
                                         @elseif($cuenta->estado == 'pendiente') bg-warning text-dark
+                                        @elseif($cuenta->estado == 'revision') bg-info text-dark
                                         @else bg-secondary @endif">
                                         <i class="fas 
                                             @if($cuenta->estado == 'pagada') fa-check 
+                                            @elseif($cuenta->estado == 'revision') fa-search
                                             @else fa-clock @endif me-1"></i>
-                                        {{ ucfirst($cuenta->estado) }}
+                                        {{ $cuenta->estado == 'revision' && auth()->user()->hasRole('ordenador_gasto') ? 'Ya revisado' : ucfirst($cuenta->estado) }}
                                     </span>
                                 </div>
                             </li>

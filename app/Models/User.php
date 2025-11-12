@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role_id'];
+    protected $fillable = ['name', 'email', 'password', 'role_id', 'is_approved'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -18,14 +18,15 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'is_approved'       => 'boolean',
         ];
     }
 
-    // Relación con Roles
+    // Relación con Rol (tu modelo es Roles)
     public function role()
     {
-        return $this->belongsTo(Roles::class, 'role_id'); // Si el modelo es "Role", usa Role::class
+        return $this->belongsTo(Roles::class, 'role_id');
     }
 
     // Nombre del rol
@@ -39,14 +40,12 @@ class User extends Authenticatable
     public function hasAnyRole(string|array $roles): bool
     {
         $this->loadMissing('role');
-        if (!$this->role) {
-            return false;
-        }
+        if (!$this->role) return false;
         $roles = (array) $roles;
         return in_array($this->role->name, $roles, true);
     }
 
-    // ¿Tiene el rol exacto? (alias)
+    // Alias: ¿tiene rol?
     public function hasRole(string|array $roles): bool
     {
         return $this->hasAnyRole($roles);
@@ -58,40 +57,32 @@ class User extends Authenticatable
         return $this->hasAnyRole($roles);
     }
 
-    // ¿Es “alcalde”?
-    public function isAlcalde(): bool
-    {
-        return $this->hasRole('alcalde');
-    }
+    // Atajos por rol
+    public function isAlcalde(): bool        { return $this->hasRole('alcalde'); }
+    public function isContratista(): bool    { return $this->hasRole('contratista'); }
+    public function isOrdenadorGasto(): bool { return $this->hasRole('ordenador_gasto'); }
 
-    // ¿Es “contratista”?
-    public function isContratista(): bool
-    {
-        return $this->hasRole('contratista');
-    }
-
-    // ¿Es “ordenador de gasto”?
-    public function isOrdenadorGasto(): bool
-    {
-        return $this->hasRole('ordenador_gasto');
-    }
-
-    // ¿Puede aprobar pagos?
+    // Capacidades
     public function canApprovePayments(): bool
     {
         return $this->hasAnyRole(['alcalde', 'ordenador_gasto', 'tesoreria']);
     }
 
-    // ¿Puede gestionar contratos?
     public function canManageContracts(): bool
     {
         return $this->hasAnyRole(['contratacion', 'alcalde']);
     }
 
-    // Permisos por rol (para Gates/Policies avanzadas)
+    // Permisos por rol (si Roles implementa hasPermission)
     public function hasPermission(string $permission): bool
     {
         $this->loadMissing('role');
         return $this->role?->hasPermission($permission) === true;
+    }
+
+    // Cuentas de cobro creadas por el usuario
+    public function cuentasCobro()
+    {
+        return $this->hasMany(CuentaCobro::class, 'user_id');
     }
 }

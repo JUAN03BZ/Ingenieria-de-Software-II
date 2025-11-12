@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\CuentaCobro;
 
 class AuthController extends Controller
 {
@@ -44,22 +45,32 @@ class AuthController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $cuentas = \App\Models\CuentaCobro::where('user_id', $user->id)->get();
 
-        $totalCuentas   = $cuentas->count();
-        $pagadas        = $cuentas->where('estado', 'pagada')->count();
-        $pendientes     = $cuentas->where('estado', 'pendiente')->count();
-        $totalFacturado = $cuentas->where('estado', 'pagada')
+        // KPIs del usuario autenticado (propias cuentas)
+        $cuentasQuery = CuentaCobro::where('user_id', $user->id);
+
+        $totalCuentas   = (clone $cuentasQuery)->count();
+        $pagadas        = (clone $cuentasQuery)->where('estado', 'pagada')->count();
+        $pendientes     = (clone $cuentasQuery)->where('estado', 'pendiente')->count();
+        $totalFacturado = (clone $cuentasQuery)
+            ->where('estado', 'pagada')
             ->where('fecha_emision', '>=', now()->startOfMonth())
             ->sum('monto');
 
-        // Solo actividades recientes APROBADAS
-        $actividadesRecientes = $cuentas
-            ->where('estado', 'aprobada')
-            ->sortByDesc('updated_at')
-            ->take(5);
+        // Actividad reciente GLOBAL (todos ven las últimas cuentas del sistema)
+        $actividadesRecientes = CuentaCobro::with(['user.role'])
+            ->whereIn('estado', ['aprobada', 'pendiente', 'rechazada'])
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
 
-        return view('dashboard', compact('totalCuentas', 'pagadas', 'pendientes', 'totalFacturado', 'actividadesRecientes'));
+        return view('dashboard', compact(
+            'totalCuentas',
+            'pagadas',
+            'pendientes',
+            'totalFacturado',
+            'actividadesRecientes'
+        ));
     }
 
     // Procesar logout

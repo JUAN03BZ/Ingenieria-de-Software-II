@@ -29,28 +29,38 @@
                     <td>{{ $cuenta->nombre_cliente }}</td>
                     <td>${{ number_format($cuenta->monto, 2) }}</td>
                     <td>
-                        @if($cuenta->estado === 'pendiente')
-                            <span class="badge bg-warning text-dark">Pendiente</span>
-                        @elseif($cuenta->estado === 'revision')
-                            <span class="badge bg-info text-dark">Revisión</span>
-                        @elseif($cuenta->estado === 'aprobada')
-                            <span class="badge bg-success text-white">Aprobada</span>
-                        @else
-                            <span class="badge bg-secondary text-white">{{ ucfirst($cuenta->estado) }}</span>
-                        @endif
+                        @php
+                            $estadoClass = match($cuenta->estado) {
+                                'pendiente' => 'warning text-dark',
+                                'revision'  => 'info text-dark',
+                                'aprobada'  => 'success text-white',
+                                'rechazada' => 'danger text-white',
+                                default     => 'secondary text-white'
+                            };
+                            $estadoLabel = ucfirst($cuenta->estado);
+                        @endphp
+                        <span class="badge bg-{{ explode(' ', $estadoClass)[0] }} {{ explode(' ', $estadoClass)[1] ?? '' }}">
+                            {{ $estadoLabel }}
+                        </span>
                     </td>
                     <td>
-                        @if(auth()->user()->hasRole('alcalde') || auth()->user()->hasRole('contratista'))
-                        <form action="{{ route('cuenta.cobro.cambiar.estado', $cuenta) }}" method="POST" class="d-inline">
-                            @csrf
-                            <select name="estado" class="form-select form-select-sm d-inline w-auto">
-                                <option value="pendiente" @if($cuenta->estado==='pendiente') selected @endif>Pendiente</option>
-                                <option value="revision" @if($cuenta->estado==='revision') selected @endif>Revisión</option>
-                                <option value="aprobada" @if($cuenta->estado==='aprobada') selected @endif>Aprobada</option>
-                            </select>
-                            <button class="btn btn-primary btn-sm" type="submit">Actualizar</button>
-                        </form>
-                        @endif
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('cuenta.cobro.show', $cuenta) }}" class="btn btn-sm btn-outline-info">Ver</a>
+
+                            {{-- Cambio de estado SOLO alcalde (contratista no cambia estado) --}}
+                            @if(auth()->user()->isAlcalde())
+                                <form action="{{ route('cuenta.cobro.cambiar.estado', $cuenta) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <select name="estado" class="form-select form-select-sm d-inline w-auto">
+                                        <option value="pendiente" @selected($cuenta->estado==='pendiente')>Pendiente</option>
+                                        <option value="revision" @selected($cuenta->estado==='revision')>Revisión</option>
+                                        <option value="aprobada" @selected($cuenta->estado==='aprobada')>Aprobada</option>
+                                        <option value="rechazada" @selected($cuenta->estado==='rechazada')>Rechazada</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-sm" type="submit">Actualizar</button>
+                                </form>
+                            @endif
+                        </div>
                     </td>
                 </tr>
             @empty
@@ -60,6 +70,7 @@
             @endforelse
             </tbody>
         </table>
+
         @if($cuentas instanceof \Illuminate\Pagination\LengthAwarePaginator)
             {{ $cuentas->links() }}
         @endif
