@@ -66,4 +66,10 @@ class CuentaCobro extends Model
         ];
         return $map[$this->estado] ?? ucfirst($this->estado ?? 'desconocido');
     }
+
+    public function flujos()
+    {
+        return $this->hasMany(CuentaCobroFlujo::class, 'cuenta_cobro_id')->latest();
+    }
+
 }

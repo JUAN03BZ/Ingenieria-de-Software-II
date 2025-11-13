@@ -12,8 +12,7 @@
                             <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary me-2">
                                 <i class="fas fa-arrow-left me-1"></i> Menú
                             </a>
-
-                            {{-- Botón pendientes (muestra si el rol participa en revisión) --}}
+                            {{-- Botón pendientes (solo si no es contratista) --}}
                             @if(auth()->user()->hasAnyRole(['ordenador_gasto','supervisor','tesoreria','alcalde']))
                                 <a href="{{ route('cuenta.cobro.pendientes') }}" class="btn btn-warning">
                                     Cuentas Pendientes
@@ -90,7 +89,25 @@
                                                         </form>
                                                     @endcan
 
-                                                    {{-- Acciones de aprobación/rechazo visibles solo si corresponde (p. ej. alcalde) --}}
+                                                    {{-- Acciones de supervisión --}}
+                                                    @if(
+                                                        auth()->user()->hasRole('supervisor') &&
+                                                        $cuenta->fase === 'supervisor' &&
+                                                        $cuenta->estado === 'pendiente'
+                                                    )
+                                                        <form action="{{ route('cuenta.cobro.aprobar', $cuenta->id) }}" method="POST" class="d-inline ms-1">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm">Aprobar</button>
+                                                        </form>
+                                                        <form action="{{ route('cuenta.cobro.rechazar', $cuenta->id) }}" method="POST" class="d-inline ms-1">
+                                                            @csrf
+                                                            <input type="text" name="observaciones" placeholder="Motivo del rechazo" required
+                                                                   class="form-control d-inline" style="width:160px;">
+                                                            <button type="submit" class="btn btn-danger btn-sm ms-1">Rechazar</button>
+                                                        </form>
+                                                    @endif
+
+                                                    {{-- Acciones de alcaldía --}}
                                                     @if(auth()->user()->isAlcalde() && in_array($cuenta->estado, ['pendiente','revision','aprobada']))
                                                         <form action="{{ route('cuenta.cobro.aprobar', $cuenta->id) }}" method="POST" class="d-inline ms-1">
                                                             @csrf
@@ -110,7 +127,6 @@
                                 </tbody>
                             </table>
                         </div>
-
                         <div class="mt-3">
                             {{ $cuentas->links() }}
                         </div>

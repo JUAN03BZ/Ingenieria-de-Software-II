@@ -56,10 +56,12 @@
             <i class="fas fa-file-invoice"></i>
             <span class="link-text">Cuentas de Cobro</span>
         </a>
+        @if(!auth()->user()->hasRole('contratista'))
         <a class="nav-link" href="{{ route('cuenta.cobro.pendientes') }}">
             <i class="fas fa-hourglass-half"></i>
             <span class="link-text">Cuentas Pendientes</span>
         </a>
+        @endif
         @if(!auth()->user()->hasRole('ordenador_gasto') && !auth()->user()->hasRole('supervisor'))
         <a class="nav-link" href="{{ route('cuenta.cobro.create') }}">
             <i class="fas fa-plus-circle"></i>
@@ -97,7 +99,6 @@
 <!-- CONTENIDO PRINCIPAL -->
 <div class="main-wrapper" id="mainWrapper">
     <div class="content-surface container-fluid py-4">
-
         <!-- ENCABEZADO -->
         <div class="page-header d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -109,7 +110,6 @@
                 </p>
             </div>
         </div>
-
         <div class="row g-4 mb-4">
             <!-- INFO DE USUARIO -->
             <div class="col-lg-4">
@@ -163,12 +163,14 @@
                                 </a>
                             </div>
                             @endif
+                            @if(!auth()->user()->hasRole('contratista'))
                             <div class="col-12 col-md-4">
                                 <a href="{{ route('cuenta.cobro.pendientes') }}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center py-3">
                                     <i class="fas fa-hourglass-half fa-2x mb-2"></i>
                                     <span>Cuentas Pendientes</span>
                                 </a>
                             </div>
+                            @endif
                             <div class="col-12 col-md-4">
                                 <a href="{{ route('cuenta.cobro.index') }}" class="btn btn-outline-light w-100 d-flex flex-column align-items-center py-3">
                                     <i class="fas fa-list fa-2x mb-2"></i>
@@ -189,13 +191,79 @@
             </div>
         </div>
 
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
-                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
+        <!-- 1: SECCIÓN INTELIGENTE POR ROL Y FASE -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-transparent d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">
+              <i class="fas fa-bullseye text-primary me-2"></i>
+              Cuentas de cobro para
+              <span class="text-info fw-bold">{{ ucfirst(auth()->user()->role->name ?? 'Sin Rol') }}</span>
+            </h5>
+            <span class="badge bg-info">Total: <b>{{ $cuentas->count() }}</b></span>
+          </div>
+          <div class="card-body">
+            @if(isset($cuentas) && $cuentas->count())
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Cliente</th>
+                      <th>Cobrador</th>
+                      <th>Fecha</th>
+                      <th>Descripción</th>
+                      <th>Monto</th>
+                      <th>Estado</th>
+                      <th>Fase</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($cuentas as $cuenta)
+                    <tr>
+                      <td>{{ $cuenta->id }}</td>
+                      <td>{{ $cuenta->nombre_cliente }}</td>
+                      <td>{{ $cuenta->nombre_cobrador }}</td>
+                      <td>{{ optional($cuenta->fecha_emision)->format('Y-m-d') ?? $cuenta->fecha_emision }}</td>
+                      <td>{{ \Illuminate\Support\Str::limit($cuenta->descripcion,40) }}</td>
+                      <td>${{ number_format($cuenta->monto,2) }}</td>
+                      <td>
+                        @php
+                          $estadoClass = match($cuenta->estado) {
+                            'pendiente' => 'warning',
+                            'aprobada' => 'primary',
+                            'pagada' => 'success',
+                            'rechazada' => 'danger',
+                            'revision' => 'info',
+                            default => 'secondary'
+                          };
+                        @endphp
+                        <span class="badge bg-{{ $estadoClass }}">{{ ucfirst($cuenta->estado) }}</span>
+                      </td>
+                      <td><span class="badge bg-light text-dark">{{ ucfirst($cuenta->fase) }}</span></td>
+                      <td>
+                        <a href="{{ route('cuenta.cobro.show', $cuenta) }}" class="btn btn-sm btn-outline-info">Ver</a>
+                      </td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            @else
+              <div class="text-center py-5">
+                <i class="fas fa-inbox fa-4x text-muted mb-3 muted-icon"></i>
+                <h5 class="text-muted">No tienes cuentas asociadas a tu fase.</h5>
+                @if(auth()->user()->hasRole('contratista'))
+                  <a href="{{ route('cuenta.cobro.create') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Crea tu primera cuenta
+                  </a>
+                @endif
+              </div>
+            @endif
+          </div>
+        </div>
+        <!-- 2: ACTIVIDAD RECIENTE y resto -->
         @isset($actividadesRecientes)
         <div class="card shadow-sm bg-dark border-0 text-light mb-5 activity-card">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
@@ -262,11 +330,9 @@
             </div>
         </div>
         @endisset
-
     </div>
 </div>
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-
 <script>
     // Sidebar toggle
     const toggleBtn = document.getElementById('toggleSidebar');

@@ -23,6 +23,7 @@
             @endphp
             <span class="badge bg-{{ $estadoClass }}">{{ ucfirst($cuenta->estado) }}</span>
         </li>
+        <li class="list-group-item"><strong>Fase actual:</strong> {{ ucfirst($cuenta->fase) }}</li>
         <li class="list-group-item"><strong>Descripción:</strong> {{ $cuenta->descripcion }}</li>
         <li class="list-group-item"><strong>Fecha emisión:</strong> {{ optional($cuenta->fecha_emision)->format('Y-m-d') ?? $cuenta->fecha_emision }}</li>
         @if($cuenta->observaciones)
@@ -32,32 +33,122 @@
 
     <div class="mb-3 d-flex align-items-center gap-2">
         <a href="{{ route('cuenta.cobro.index') }}" class="btn btn-secondary">Volver al listado</a>
-
         @can('update', $cuenta)
             <a href="{{ route('cuenta.cobro.edit', $cuenta->id) }}" class="btn btn-warning">Editar</a>
         @endcan
-
         @can('delete', $cuenta)
             <form action="{{ route('cuenta.cobro.destroy', $cuenta->id) }}" method="POST" class="d-inline"
                   onsubmit="return confirm('¿Eliminar esta cuenta de cobro?');">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn btn-danger">Eliminar</button>
             </form>
-        @endcan>
-
-        {{-- Aprobación/Rechazo solo para alcalde --}}
-        @if(auth()->user()->isAlcalde() && in_array($cuenta->estado, ['pendiente','revision','aprobada']))
-            <form action="{{ route('cuenta.cobro.aprobar', $cuenta->id) }}" method="POST" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-success">Aprobar</button>
-            </form>
-            <form action="{{ route('cuenta.cobro.rechazar', $cuenta->id) }}" method="POST" class="d-inline ms-2">
-                @csrf
-                <input type="text" name="observaciones" placeholder="Motivo del rechazo" required
-                       class="form-control d-inline" style="width:180px;">
-                <button type="submit" class="btn btn-danger ms-1">Rechazar</button>
-            </form>
-        @endif
+        @endcan
     </div>
+
+    {{-- HISTORIAL DE FLUJO DE REVISIÓN --}}
+    @if($cuenta->flujos && $cuenta->flujos->count())
+    <div class="card mb-4">
+        <div class="card-header"><i class="fas fa-stream me-2"></i>Historial de flujo</div>
+        <ul class="list-group list-group-flush">
+            @foreach($cuenta->flujos as $f)
+                <li class="list-group-item">
+                    <strong>{{ ucfirst($f->rol) }}</strong> — <b>{{ ucfirst($f->accion) }}</b>
+                    <small class="text-muted">{{ $f->created_at->format('d/m/Y H:i') }}
+                        @if($f->user) por {{ $f->user->name }} @endif
+                    </small><br>
+                    @if($f->comentario)<em>{{ $f->comentario }}</em>@endif
+                </li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    {{-- BLOQUES DE FORMULARIO ÚNICOS POR FASE/ROL --}}
+    @auth
+      @if(auth()->user()->hasRole('contratista') && $cuenta->fase === 'creada' && $cuenta->user_id === auth()->id())
+        <form action="{{ route('cuenta.cobro.enviar.supervisor', $cuenta) }}" method="POST" class="mt-3">
+          @csrf
+          <button class="btn btn-primary">Enviar a Supervisor</button>
+        </form>
+      @endif
+
+      @if(auth()->user()->hasRole('supervisor') && $cuenta->fase === 'supervisor')
+        <form action="{{ route('cuenta.cobro.supervisor', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
+          @csrf
+          <div class="col-auto">
+            <select name="decision" class="form-select" required>
+              <option value="aprobado">Aprobar</option>
+              <option value="rechazado">Rechazar</option>
+            </select>
+          </div>
+          <div class="col">
+            <input name="comentario" class="form-control" placeholder="Motivo (obligatorio)" required>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary">Registrar</button>
+          </div>
+        </form>
+      @endif
+
+      @if(auth()->user()->hasRole('contratacion') && $cuenta->fase === 'contratacion')
+        <form action="{{ route('cuenta.cobro.contratacion', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
+          @csrf
+          <div class="col-auto">
+            <select name="decision" class="form-select" required>
+              <option value="aprobado">Aprobar</option>
+              <option value="rechazado">Rechazar</option>
+            </select>
+          </div>
+          <div class="col">
+            <input name="comentario" class="form-control" placeholder="Motivo (obligatorio)" required>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary">Registrar</button>
+          </div>
+        </form>
+      @endif
+
+      @if(auth()->user()->hasRole('tesoreria') && $cuenta->fase === 'tesoreria')
+        <form action="{{ route('cuenta.cobro.tesoreria', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
+          @csrf
+          <div class="col-auto">
+            <select name="decision" class="form-select" required>
+              <option value="aprobado">Aprobar</option>
+              <option value="rechazado">Rechazar</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <select name="hay_fondos" class="form-select" required>
+              <option value="1">Con fondos</option>
+              <option value="0">Sin fondos</option>
+            </select>
+          </div>
+          <div class="col">
+            <input name="comentario" class="form-control" placeholder="Motivo (obligatorio)" required>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary">Registrar</button>
+          </div>
+        </form>
+      @endif
+
+      @if(auth()->user()->hasRole('ordenador_gasto') && $cuenta->fase === 'ordenador')
+        <form action="{{ route('cuenta.cobro.ordenador', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
+          @csrf
+          <div class="col-auto">
+            <select name="decision" class="form-select" required>
+              <option value="aprobado">Aprobar (final)</option>
+              <option value="rechazado">Rechazar</option>
+            </select>
+          </div>
+          <div class="col">
+            <input name="comentario" class="form-control" placeholder="Motivo (obligatorio)" required>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-success">Registrar decisión</button>
+          </div>
+        </form>
+      @endif
+    @endauth
 </div>
 @endsection

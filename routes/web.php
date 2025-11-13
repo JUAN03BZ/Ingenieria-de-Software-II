@@ -26,8 +26,12 @@ Route::post('/clientes/guardar', [ClienteController::class, 'guardar'])->name('c
 
 // Protegidas por autenticación
 Route::middleware(['auth'])->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+    // Dashboard por rol/fase como principal
+    Route::get('/dashboard', [CuentaCobroController::class, 'dashboardFases'])->name('dashboard');
+
+    // Alias opcional al mismo dashboard
+    Route::get('/dashboard-cuentas', [CuentaCobroController::class, 'dashboardFases'])
+        ->name('cuenta.cobro.dashboard');
 
     // Cuentas de Cobro
     Route::get('/cuentas-cobro', [CuentaCobroController::class, 'index'])->name('cuenta.cobro.index');
@@ -41,12 +45,27 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/cuenta-cobro/{cuenta}', [CuentaCobroController::class, 'update'])->name('cuenta.cobro.update');
     Route::delete('/cuenta-cobro/{cuenta}', [CuentaCobroController::class, 'destroy'])->name('cuenta.cobro.destroy');
 
-    // Cambio de estado SOLO alcalde
-    Route::post('/cuenta-cobro/{cuenta}/cambiar-estado', [CuentaCobroController::class, 'cambiarEstado'])
-        ->name('cuenta.cobro.cambiar.estado')
-        ->middleware('role:alcalde');
+    // Ruta para enviar a supervisor (solo contratista o alcalde)
+    Route::post('/cuenta-cobro/{cuenta}/enviar-supervisor', [CuentaCobroController::class, 'enviarASupervision'])
+        ->name('cuenta.cobro.enviar.supervisor')->middleware('role:contratista,alcalde');
 
-    // Acciones específicas SOLO alcalde
+    // Supervisor: aprobar/rechazar vía supervisorDecision (¡corregido!)
+    Route::post('/cuenta-cobro/{cuenta}/supervisor', [CuentaCobroController::class, 'supervisorDecision'])
+        ->name('cuenta.cobro.supervisor')->middleware('role:supervisor');
+
+    // Contratación
+    Route::post('/cuenta-cobro/{cuenta}/contratacion', [CuentaCobroController::class, 'contratacionDecision'])
+        ->name('cuenta.cobro.contratacion')->middleware('role:contratacion');
+
+    // Tesorería
+    Route::post('/cuenta-cobro/{cuenta}/tesoreria', [CuentaCobroController::class, 'tesoreriaDecision'])
+        ->name('cuenta.cobro.tesoreria')->middleware('role:tesoreria');
+
+    // Ordenador de gasto
+    Route::post('/cuenta-cobro/{cuenta}/ordenador', [CuentaCobroController::class, 'ordenadorDecision'])
+        ->name('cuenta.cobro.ordenador')->middleware('role:ordenador_gasto');
+
+    // (Opcional solo para alcaldía, si tienes métodos directos de aprobar/rechazar globales)
     Route::post('/cuenta-cobro/{cuenta}/aprobar', [CuentaCobroController::class, 'aprobar'])
         ->name('cuenta.cobro.aprobar')
         ->middleware('role:alcalde');
@@ -61,7 +80,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas admin (solo alcalde)
     Route::middleware('role:alcalde')->prefix('admin')->name('admin.')->group(function () {
-        // Usuarios pendientes y acciones
         Route::get('/usuarios/pendientes', [RolController::class, 'usuariosPendientes'])->name('usuarios.pendientes');
         Route::post('/usuarios/{usuario}/aprobar', [RolController::class, 'aprobarUsuario'])->name('usuarios.aprobar');
         Route::post('/usuarios/{usuario}/asignar-rol', [RolController::class, 'asignarRol'])->name('usuarios.asignar-rol');
