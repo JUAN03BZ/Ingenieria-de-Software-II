@@ -5,7 +5,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--app-font);
     color: rgba(0, 0, 0, 0.7);
     min-height: 100vh;
     display: flex;
@@ -100,7 +100,7 @@ body {
     color: #fff;
     border-radius: 4px;
     background: #8c7569;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--app-font);
     font-size: 15px;
     font-weight: 600;
     transition: 0.3s;
@@ -116,7 +116,7 @@ body {
 .input-label {
     font-size: 11px;
     text-transform: uppercase;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--app-font);
     font-weight: 600;
     letter-spacing: 0.7px;
     color: #8c7569;
@@ -138,7 +138,7 @@ body {
     border: 0;
     padding: 4px 0 0;
     font-size: 14px;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--app-font);
 }
 
 .input-block input::placeholder {

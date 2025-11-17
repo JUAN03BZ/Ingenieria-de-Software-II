@@ -1,0 +1,41 @@
+/* Global font settings for the whole app */
+:root {
+    --app-font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, "Helvetica Neue", Arial, 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+/* Apply globally */
+html, body {
+    font-family: var(--app-font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure form controls, buttons, headings, navs and tables inherit the same font */
+input, button, select, textarea, .btn, .form-control, .form-select, .breadcrumb, .card, .table, h1, h2, h3, h4, h5, h6, .navbar, .nav-link, .dropdown-menu {
+    font-family: var(--app-font) !important;
+}
+
+/* Strong global fallback to ensure blade views render with the same font
+   (keeps code/pre as monospace). This uses a limited set of selectors to avoid
+   interfering with third-party vendor styles. */
+body, main, header, footer, section, article, .container, .content-surface, .main-wrapper, .page-header, .card, .metric-card, .list-group-item, .sidebar, .nav-link, table, th, td, label, p, span, a, li {
+    font-family: var(--app-font) !important;
+}
+
+/* Slight adjustments for readability */
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.15rem; }
+
+/* Slight weight tweaks to use Inter variants */
+body, button, input, textarea, select { font-weight: 400; }
+h1, h2, h3, h4, h5, h6 { font-weight: 600; }
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.15rem; }
+
+/* Respect user zoom / accessibility */
+html { font-size: 100%; }
+
+/* Keep monospace for code blocks */
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace; }

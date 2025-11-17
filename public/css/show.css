@@ -68,26 +68,7 @@ h2.fw-bold, h5.fw-bold {
     border: 1px solid #dbeafe;
 }
 
-/* === TABLA === */
-.table {
-    border-radius: 14px;
-    overflow: hidden;
-    background: #1e293b;
-    color: #e2e8f0;
-}
-.table th, .table td {
-    border-top: none !important;
-    font-size: 0.875rem;
-    vertical-align: middle;
-    padding: 0.80rem 0.75rem;
-}
-.table-dark th {
-    background: #334155 !important;
-    color: #e2e8f0 !important;
-}
-.table-hover tbody tr:hover {
-    background: rgba(59,130,246,0.12) !important;
-}
+/* Tabla styles moved to public/css/tables.css */
 
 /* === BUTTONS === */
 .btn-outline-secondary {
@@ -171,7 +152,7 @@ h2.fw-bold, h5.fw-bold {
 
 /* === RESPONSIVE === */
 @media (max-width: 900px){
-    .card-header, .card-body, .table th, .table td { padding: 14px 10px !important; }
+    .card-header, .card-body { padding: 14px 10px !important; }
     h2.fw-bold { font-size: 1.2rem !important; }
     .breadcrumb { font-size: 0.85rem; }
     .btn { font-size: 0.96rem !important;}

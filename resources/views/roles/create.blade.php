@@ -2,6 +2,10 @@
 
 @section('title', 'Crear Nuevo Rol - CuentasCobro')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/crear-rol.css') }}">
+@endpush
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -17,10 +21,10 @@
                                     <i class="fas fa-users-cog me-1"></i>Roles
                                 </a>
                             </li>
-                            <li class="breadcrumb-item active">Crear Nuevo Rol</li>
+                            <li class="breadcrumb-item active" aria-current="page">Crear Nuevo Rol</li>
                         </ol>
                     </nav>
-                    <h2 class="fw-bold text-dark mb-0">
+                    <h2 class="fw-bold mb-0">
                         <i class="fas fa-plus-circle me-2" style="color:#3b82f6;"></i>
                         Crear Nuevo Rol
                     </h2>
@@ -43,7 +47,7 @@
                     <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             @endif
 
@@ -77,7 +81,9 @@
                                         <i class="fas fa-info-circle me-1"></i>
                                         Use solo letras minúsculas y guiones bajos
                                     </div>
-                                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    @error('name') 
+                                    <div class="invalid-feedback">{{ $message }}</div> 
+                                    @enderror
                                 </div>
 
                                 <!-- Descripción del rol -->
@@ -95,17 +101,19 @@
                                     <div class="form-text">
                                         <i class="fas fa-info-circle me-1"></i>Máximo 500 caracteres
                                     </div>
-                                    @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    @error('description') 
+                                    <div class="invalid-feedback">{{ $message }}</div> 
+                                    @enderror
                                 </div>
 
                                 <!-- Estadísticas de permisos seleccionados -->
-                                <div class="mb-3">
+                                <div class="mb-0">
                                     <div class="card bg-light">
                                         <div class="card-body py-2">
                                             <h6 class="mb-1" style="color:#3b82f6;">
                                                 <i class="fas fa-chart-pie me-1"></i>Resumen de Permisos
                                             </h6>
-                                            <div class="d-flex justify-content-between">
+                                            <div class="d-flex justify-content-between mb-1">
                                                 <small class="text-muted">Permisos seleccionados:</small>
                                                 <span class="badge bg-info" id="selectedCount">0</span>
                                             </div>
@@ -270,10 +278,6 @@
 </div>
 @endsection
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/crear-rol.css') }}">
-@endpush
-
 @push('scripts')
 <script>
     // Auto-ocultar alertas después de 5 segundos
@@ -285,39 +289,61 @@
         });
     }, 5000);
     
+    // Actualizar contador de permisos seleccionados
     function updatePermissionCount() {
         const checked = document.querySelectorAll('input[name="permissions[]"]:checked').length;
         document.getElementById('selectedCount').textContent = checked;
     }
+    
+    // Seleccionar todos los permisos
     function selectAllPermissions() {
         document.querySelectorAll('input[name="permissions[]"]').forEach(cb => cb.checked = true);
         updatePermissionCount();
     }
+    
+    // Limpiar todos los permisos
     function clearAllPermissions() {
         document.querySelectorAll('input[name="permissions[]"]').forEach(cb => cb.checked = false);
         updatePermissionCount();
     }
+    
+    // Toggle permisos por categoría
     function toggleCategoryPermissions(category) {
         const boxes = document.querySelectorAll(`.${category}-permission`);
-        const shouldCheck = Array.from(boxes).every(cb => !cb.checked);
-        boxes.forEach(cb => cb.checked = shouldCheck);
+        const allChecked = Array.from(boxes).every(cb => cb.checked);
+        boxes.forEach(cb => cb.checked = !allChecked);
         updatePermissionCount();
     }
+    
     // Validación del formulario
     document.getElementById('createRoleForm').addEventListener('submit', function(e) {
         const name = document.getElementById('name').value.trim();
         const description = document.getElementById('description').value.trim();
-        if (!name || !description) { e.preventDefault(); alert('Por favor complete todos los campos obligatorios.'); return; }
+        
+        if (!name || !description) {
+            e.preventDefault();
+            alert('Por favor complete todos los campos obligatorios.');
+            return;
+        }
+        
         const namePattern = /^[a-z_]+$/;
-        if (!namePattern.test(name)) { e.preventDefault(); alert('El nombre del rol solo puede contener letras minúsculas y guiones bajos.'); return; }
+        if (!namePattern.test(name)) {
+            e.preventDefault();
+            alert('El nombre del rol solo puede contener letras minúsculas y guiones bajos.');
+            return;
+        }
     });
+    
     // Formatear el nombre automáticamente
     document.getElementById('name').addEventListener('input', function(e) {
         let value = e.target.value;
         value = value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z_]/g, '');
         e.target.value = value;
     });
-    // Inicializar contador
-    document.addEventListener('DOMContentLoaded', updatePermissionCount);
+    
+    // Inicializar contador al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePermissionCount();
+    });
 </script>
 @endpush

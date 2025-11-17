@@ -64,7 +64,7 @@
             </div>
 
             <div class="modal-right">
-                <img src="{{ asset('img/img2.jpg') }}" alt="">
+                <img src="{{ asset('img/img2.jpg') }}" alt="" loading="lazy">
             </div>
 
             <button class="icon-button close-button" type="button">

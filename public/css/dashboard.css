@@ -19,7 +19,7 @@
 *{box-sizing:border-box}
 body {
     background: linear-gradient(135deg, #1a1d29 0%, #2d3142 50%, #3f4354 100%);
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--app-font);
     color: var(--text);
     margin: 0;
     overflow-x: hidden;

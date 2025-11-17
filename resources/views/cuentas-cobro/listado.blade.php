@@ -54,7 +54,7 @@
                     <!-- ESTADO VACÍO -->
                     <div class="text-center py-5">
                         <div class="mb-4">
-                            <i class="fas fa-inbox fa-4x" style="color: #64748b; opacity: 0.5;"></i>
+                            <i class="fas fa-inbox fa-4x" style="color: #cacaca; opacity: 0.5;"></i>
                         </div>
                         <h4 style="color: #94a3b8; font-weight: 600;">No hay cuentas de cobro</h4>
                         <p class="text-muted mb-4">Comienza creando tu primera cuenta de cobro</p>

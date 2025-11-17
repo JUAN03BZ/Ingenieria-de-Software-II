@@ -82,57 +82,7 @@ h2.mb-0 {
     padding: 26px 24px 22px 24px;
 }
 
-/* === TABLA === */
-.table-responsive {
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 0;
-}
-
-.table {
-    background: rgba(30, 41, 59, 0.8);
-    color: #e2e8f0;
-    border-radius: 14px;
-    margin-bottom: 0;
-    --bs-table-bg: rgba(30, 41, 59, 0.8);
-    --bs-table-striped-bg: rgba(45, 49, 66, 0.8);
-    --bs-table-striped-color: #e2e8f0;
-    --bs-table-hover-bg: rgba(59, 130, 246, 0.15);
-    --bs-table-hover-color: #ffffff;
-    border: 1px solid rgba(59, 130, 246, 0.1);
-}
-
-.table thead {
-    background: linear-gradient(135deg, #1e293b, #334155);
-    color: #ffffff;
-}
-
-.table th,
-.table td {
-    border-top: none !important;
-    font-size: 0.95rem;
-    vertical-align: middle;
-    padding: 0.76rem 0.7rem;
-    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
-}
-
-.table-striped > tbody > tr:nth-of-type(odd) {
-    background: rgba(35, 37, 57, 0.6);
-}
-
-.table-striped > tbody > tr:nth-of-type(even) {
-    background: rgba(45, 49, 66, 0.6);
-}
-
-.table-hover tbody tr {
-    transition: all 0.3s ease;
-}
-
-.table-hover tbody tr:hover {
-    background: rgba(59, 130, 246, 0.2) !important;
-    color: #fff !important;
-    transform: translateX(5px);
-}
+/* Tabla styles moved to public/css/tables.css */
 
 /* === BADGES DE ESTADO === */
 .badge {
@@ -258,11 +208,7 @@ h2.mb-0 {
         margin-top: 13px; 
     }
     
-    .table th,
-    .table td {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.4rem;
-    }
+    /* Table responsive rules moved to public/css/tables.css */
     
     .badge {
         font-size: 0.8rem;

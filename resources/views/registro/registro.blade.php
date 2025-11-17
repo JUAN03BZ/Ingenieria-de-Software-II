@@ -63,7 +63,7 @@
                 </form>
             </div>
 
-            <div class="modal-right"> <img src="{{ asset('img/img1.jpg') }}" alt="">
+            <div class="modal-right"> <img src="{{ asset('img/img1.jpg') }}" alt="" loading="lazy">
 
                
             </div>
