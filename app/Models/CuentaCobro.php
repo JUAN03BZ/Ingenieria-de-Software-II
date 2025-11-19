@@ -25,7 +25,7 @@ class CuentaCobro extends Model
         'descripcion',
         'fecha_emision',
         'user_id',
-        'estado',          // 'pendiente' | 'aprobada' | 'rechazada' | 'revision' | 'pagada'
+        'estado',         // 'pendiente' | 'aprobada' | 'rechazada' | 'revision' | 'pagada'
         'observaciones',
     ];
 
@@ -42,6 +42,12 @@ class CuentaCobro extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Relación con archivos de soporte
+    public function archivos()
+    {
+        return $this->hasMany(\App\Models\ArchivoCuentaCobro::class, 'cuenta_cobro_id');
     }
 
     // Scope actividad reciente (reutilizable)
@@ -71,5 +77,4 @@ class CuentaCobro extends Model
     {
         return $this->hasMany(CuentaCobroFlujo::class, 'cuenta_cobro_id')->latest();
     }
-
 }

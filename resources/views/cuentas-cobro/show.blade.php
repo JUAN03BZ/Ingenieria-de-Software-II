@@ -13,6 +13,9 @@
         Detalle Cuenta de Cobro #{{ $cuenta->id }}
     </h2>
 
+    {{-- Forzar carga correcta de la relación archivos si el controlador no lo hace --}}
+    @php $cuenta->loadMissing('archivos'); @endphp
+
     <ul class="list-group mb-4">
         <li class="list-group-item">
             <strong><i class="fas fa-user me-1"></i>Cobrador:</strong> 
@@ -66,6 +69,31 @@
             </li>
         @endif
     </ul>
+
+    {{-- Soportes adjuntos --}}
+    @if($cuenta->archivos && $cuenta->archivos->count())
+    <div class="mb-4">
+        <h5><i class="fas fa-paperclip"></i> Soportes adjuntos</h5>
+        <ul class="list-group">
+            @foreach($cuenta->archivos as $archivo)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="fas fa-file-alt me-2"></i>
+                        {{ $archivo->nombre_original }}
+                    </span>
+                    <a href="{{ route('cuenta.cobro.descargar.soporte', $archivo) }}" 
+                       class="btn btn-sm btn-outline-primary" target="_blank">
+                        <i class="fas fa-download"></i> Descargar
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+    @else
+    <div class="mb-4 alert alert-info">
+        No hay soportes adjuntos para esta cuenta de cobro.
+    </div>
+    @endif
 
     <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
         <a href="{{ route('cuenta.cobro.index') }}" class="btn btn-secondary">

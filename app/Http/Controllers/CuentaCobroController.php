@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CuentaCobro;
-use App\Models\Roles; // <---- Modelo de roles real
+use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +18,7 @@ class CuentaCobroController extends Controller
         return view('cuentas-cobro.crear');
     }
 
-    // Guardar nueva cuenta
+    // Guardar nueva cuenta (con carga de archivos)
     public function store(Request $request)
     {
         $this->authorize('create', CuentaCobro::class);
@@ -34,25 +34,44 @@ class CuentaCobroController extends Controller
             'monto'              => 'required|numeric|min:0',
             'descripcion'        => 'nullable|string',
             'fecha_emision'      => 'nullable|date',
+            'archivos.*'         => 'file|max:10240', // Hasta 10MB por archivo
         ]);
+
         $validated['user_id'] = Auth::id();
         $validated['estado']  = 'pendiente';
         $validated['fase']    = 'creada';
 
         $cuenta = CuentaCobro::create($validated);
 
+        // Guardar archivos si se subieron y la subida fue exitosa
+        if ($request->hasFile('archivos')) {
+            foreach ($request->file('archivos') as $archivo) {
+                $filename = uniqid().'_'.$archivo->getClientOriginalName();
+                $ruta = Storage::disk('ftp')->putFileAs('soportes/'.$cuenta->id, $archivo, $filename);
+
+                // Solo registrar si la subida fue ok
+                if ($ruta && $ruta !== '0' && $ruta !== false) {
+                    $cuenta->archivos()->create([
+                        'nombre_original' => $archivo->getClientOriginalName(),
+                        'ruta'            => $ruta,
+                    ]);
+                }
+            }
+        }
+
+        // Registrar evento/flujo
         $cuenta->flujos()->create([
-            'user_id'   => Auth::id(),
-            'rol'       => Auth::user()->role->name ?? 'contratista',
-            'accion'    => 'creada',
-            'comentario'=> 'Cuenta registrada',
+            'user_id'    => Auth::id(),
+            'rol'        => Auth::user()->role->name ?? 'contratista',
+            'accion'     => 'creada',
+            'comentario' => 'Cuenta registrada',
         ]);
 
         return redirect()->route('cuenta.cobro.pendientes')
             ->with('success', 'Cuenta de cobro creada exitosamente.');
     }
 
-    // Listado general
+    // Listado general de cuentas de cobro
     public function index()
     {
         $user = auth()->user();
@@ -60,7 +79,6 @@ class CuentaCobroController extends Controller
         if ($user->hasRole('supervisor')) {
             $cuentas = CuentaCobro::where('fase', 'supervisor')->orderBy('created_at', 'desc')->paginate(10);
         } elseif ($user->hasRole('contratista')) {
-            // Usuarios con role_id de alcalde
             $alcaldeRoleId = Roles::where('name', 'alcalde')->value('id');
             $alcaldes = [];
             if ($alcaldeRoleId) {
@@ -94,7 +112,6 @@ class CuentaCobroController extends Controller
     // Contratista o alcalde: enviar a supervisor
     public function enviarASupervision(CuentaCobro $cuenta)
     {
-        // Se permite a cualquier contratista (no hay authorize aquí)
         $cuenta->fase   = 'supervisor';
         $cuenta->estado = 'pendiente';
         $cuenta->save();
@@ -232,9 +249,7 @@ class CuentaCobroController extends Controller
     // Cambio de estado manual solo alcaldía (legacy)
     public function cambiarEstado(Request $request, CuentaCobro $cuenta)
     {
-        if (!Auth::user()->isAlcalde()) {
-            abort(403);
-        }
+        if (!Auth::user()->isAlcalde()) abort(403);
 
         $data = $request->validate([
             'estado' => 'required|in:pendiente,revision,aprobada,rechazada,pagada',
@@ -246,11 +261,11 @@ class CuentaCobroController extends Controller
         return back()->with('success', 'Estado actualizado correctamente.');
     }
 
-    // Ver detalle
+    // Ver detalle (incluye flujo y, si deseas, los archivos)
     public function show(CuentaCobro $cuenta)
     {
         $this->authorize('view', $cuenta);
-        $cuenta->load('flujos.user');
+        $cuenta->load(['flujos.user', 'archivos']);
         return view('cuentas-cobro.show', compact('cuenta'));
     }
 
@@ -326,7 +341,6 @@ class CuentaCobroController extends Controller
         } else {
             $cuentas = collect();
         }
-
         $actividadesRecientes = CuentaCobro::latest()->take(5)->get();
 
         return view('dashboard', compact('cuentas', 'actividadesRecientes'));
@@ -336,27 +350,29 @@ class CuentaCobroController extends Controller
     public function exportarCuentaPDF(CuentaCobro $cuenta)
     {
         $cuenta->load('flujos.user');
-
         $pdf = PDF::loadView('cuentas-cobro.pdf', compact('cuenta'));
 
         $filename = 'cuenta_cobro_' . $cuenta->id . '_' . time() . '.pdf';
         $localPath = storage_path('app/cuentas_cobro_pdfs/' . $filename);
 
-        // Asegúrate de que la carpeta exista
         if (!file_exists(storage_path('app/cuentas_cobro_pdfs'))) {
             mkdir(storage_path('app/cuentas_cobro_pdfs'), 0775, true);
         }
 
         $pdf->save($localPath);
 
-        // Subir al FTP
         $ftpPath = 'cuentas_cobro/' . $filename;
         Storage::disk('ftp')->put($ftpPath, file_get_contents($localPath));
 
-        // (Opcional: guardar ruta en la base)
-        // $cuenta->pdf_path = $ftpPath;
+        // $cuenta->pdf_path = $ftpPath; // Opcional
         // $cuenta->save();
 
         return response()->download($localPath);
+    }
+
+    // MÉTODO PARA DESCARGAR SOPORTES
+    public function descargarSoporte(\App\Models\ArchivoCuentaCobro $archivo)
+    {
+        return Storage::disk('ftp')->download($archivo->ruta, $archivo->nombre_original);
     }
 }

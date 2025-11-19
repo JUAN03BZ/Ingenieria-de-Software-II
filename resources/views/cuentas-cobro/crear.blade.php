@@ -50,7 +50,7 @@
 
     {{-- Formulario --}}
     @can('create', App\Models\CuentaCobro::class)
-    <form action="{{ route('cuenta.cobro.guardar') }}" method="POST" id="formCrearCuenta">
+    <form action="{{ route('cuenta.cobro.guardar') }}" method="POST" id="formCrearCuenta" enctype="multipart/form-data">
         @csrf
 
         {{-- Datos del cobrador --}}
@@ -164,6 +164,22 @@
                               class="form-control @error('descripcion') is-invalid @enderror"
                               rows="4" placeholder="Describa los servicios o productos facturados...">{{ old('descripcion') }}</textarea>
                     @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        {{-- Soportes/archivos adjuntos --}}
+        <div class="form-section">
+            <h5><i class="fas fa-paperclip"></i> Soportes adjuntos</h5>
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label for="archivos" class="form-label">
+                        <i class="fas fa-upload"></i> Adjuntar archivos (máx. 10MB c/u)
+                    </label>
+                    <input type="file" name="archivos[]" id="archivos" class="form-control" multiple>
+                    <small class="text-muted">Puedes adjuntar varios archivos de soporte en PDF, imagen, Excel, etc.</small>
                 </div>
             </div>
         </div>
