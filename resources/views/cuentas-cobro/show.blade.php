@@ -31,7 +31,7 @@
         @endif
     </ul>
 
-    <div class="mb-3 d-flex align-items-center gap-2">
+    <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
         <a href="{{ route('cuenta.cobro.index') }}" class="btn btn-secondary">Volver al listado</a>
         @can('update', $cuenta)
             <a href="{{ route('cuenta.cobro.edit', $cuenta->id) }}" class="btn btn-warning">Editar</a>
@@ -43,6 +43,16 @@
                 <button type="submit" class="btn btn-danger">Eliminar</button>
             </form>
         @endcan
+
+        {{-- BOTÓN: Descargar/exportar PDF visible para cualquier autenticado --}}
+        @auth
+            <form action="{{ route('cuenta.cobro.exportar.pdf', $cuenta) }}" method="POST" class="d-inline ms-2">
+                @csrf
+                <button type="submit" class="btn btn-outline-dark">
+                    <i class="fas fa-file-pdf"></i> Exportar e Imprimir PDF
+                </button>
+            </form>
+        @endauth
     </div>
 
     {{-- HISTORIAL DE FLUJO DE REVISIÓN --}}
@@ -65,14 +75,19 @@
 
     {{-- BLOQUES DE FORMULARIO ÚNICOS POR FASE/ROL --}}
     @auth
-      @if(auth()->user()->hasRole('contratista') && $cuenta->fase === 'creada' && $cuenta->user_id === auth()->id())
+      {{-- Mostrar a cualquier contratista si la cuenta está en 'creada' --}}
+      @if(auth()->user()->role->name === 'contratista' && $cuenta->fase === 'creada')
         <form action="{{ route('cuenta.cobro.enviar.supervisor', $cuenta) }}" method="POST" class="mt-3">
           @csrf
           <button class="btn btn-primary">Enviar a Supervisor</button>
         </form>
       @endif
 
-      @if(auth()->user()->hasRole('supervisor') && $cuenta->fase === 'supervisor')
+      @php
+        $idSupervisor = \App\Models\Roles::where('name', 'supervisor')->value('id');
+      @endphp
+
+      @if((auth()->user()->role->name === 'supervisor' || auth()->user()->role_id == $idSupervisor) && $cuenta->fase === 'supervisor')
         <form action="{{ route('cuenta.cobro.supervisor', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
           @csrf
           <div class="col-auto">
@@ -90,7 +105,7 @@
         </form>
       @endif
 
-      @if(auth()->user()->hasRole('contratacion') && $cuenta->fase === 'contratacion')
+      @if(auth()->user()->role->name === 'contratacion' && $cuenta->fase === 'contratacion')
         <form action="{{ route('cuenta.cobro.contratacion', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
           @csrf
           <div class="col-auto">
@@ -108,7 +123,7 @@
         </form>
       @endif
 
-      @if(auth()->user()->hasRole('tesoreria') && $cuenta->fase === 'tesoreria')
+      @if(auth()->user()->role->name === 'tesoreria' && $cuenta->fase === 'tesoreria')
         <form action="{{ route('cuenta.cobro.tesoreria', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
           @csrf
           <div class="col-auto">
@@ -132,7 +147,7 @@
         </form>
       @endif
 
-      @if(auth()->user()->hasRole('ordenador_gasto') && $cuenta->fase === 'ordenador')
+      @if(auth()->user()->role->name === 'ordenador_gasto' && $cuenta->fase === 'ordenador')
         <form action="{{ route('cuenta.cobro.ordenador', $cuenta) }}" method="POST" class="mt-3 row g-2 align-items-center">
           @csrf
           <div class="col-auto">

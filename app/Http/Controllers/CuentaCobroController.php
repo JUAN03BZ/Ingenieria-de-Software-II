@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CuentaCobro;
+use App\Models\Roles; // <---- Modelo de roles real
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class CuentaCobroController extends Controller
 {
@@ -57,7 +60,15 @@ class CuentaCobroController extends Controller
         if ($user->hasRole('supervisor')) {
             $cuentas = CuentaCobro::where('fase', 'supervisor')->orderBy('created_at', 'desc')->paginate(10);
         } elseif ($user->hasRole('contratista')) {
-            $cuentas = $user->cuentasCobro()->whereIn('fase', ['creada', 'finalizada'])->orderBy('created_at', 'desc')->paginate(10);
+            // Usuarios con role_id de alcalde
+            $alcaldeRoleId = Roles::where('name', 'alcalde')->value('id');
+            $alcaldes = [];
+            if ($alcaldeRoleId) {
+                $alcaldes = \App\Models\User::where('role_id', $alcaldeRoleId)->pluck('id')->toArray();
+            }
+            $ids = array_merge([$user->id], $alcaldes);
+            $cuentas = CuentaCobro::whereIn('user_id', $ids)
+                ->orderBy('created_at', 'desc')->paginate(10);
         } elseif ($user->hasRole('tesoreria')) {
             $cuentas = CuentaCobro::where('fase', 'tesoreria')->orderBy('created_at', 'desc')->paginate(10);
         } elseif ($user->hasRole('contratacion')) {
@@ -83,7 +94,7 @@ class CuentaCobroController extends Controller
     // Contratista o alcalde: enviar a supervisor
     public function enviarASupervision(CuentaCobro $cuenta)
     {
-        $this->authorize('update', $cuenta);
+        // Se permite a cualquier contratista (no hay authorize aquí)
         $cuenta->fase   = 'supervisor';
         $cuenta->estado = 'pendiente';
         $cuenta->save();
@@ -289,8 +300,13 @@ class CuentaCobroController extends Controller
         $user = auth()->user();
 
         if ($user->hasRole('contratista')) {
-            $cuentas = $user->cuentasCobro()
-                ->whereIn('fase', ['creada', 'finalizada'])
+            $alcaldeRoleId = Roles::where('name', 'alcalde')->value('id');
+            $alcaldes = [];
+            if ($alcaldeRoleId) {
+                $alcaldes = \App\Models\User::where('role_id', $alcaldeRoleId)->pluck('id')->toArray();
+            }
+            $ids = array_merge([$user->id], $alcaldes);
+            $cuentas = CuentaCobro::whereIn('user_id', $ids)
                 ->orderBy('created_at', 'desc')->get();
         } elseif ($user->hasRole('supervisor')) {
             $cuentas = CuentaCobro::where('fase', 'supervisor')
@@ -314,5 +330,33 @@ class CuentaCobroController extends Controller
         $actividadesRecientes = CuentaCobro::latest()->take(5)->get();
 
         return view('dashboard', compact('cuentas', 'actividadesRecientes'));
+    }
+
+    // ********* NUEVA FUNCIÓN PDF + FTP **********
+    public function exportarCuentaPDF(CuentaCobro $cuenta)
+    {
+        $cuenta->load('flujos.user');
+
+        $pdf = PDF::loadView('cuentas-cobro.pdf', compact('cuenta'));
+
+        $filename = 'cuenta_cobro_' . $cuenta->id . '_' . time() . '.pdf';
+        $localPath = storage_path('app/cuentas_cobro_pdfs/' . $filename);
+
+        // Asegúrate de que la carpeta exista
+        if (!file_exists(storage_path('app/cuentas_cobro_pdfs'))) {
+            mkdir(storage_path('app/cuentas_cobro_pdfs'), 0775, true);
+        }
+
+        $pdf->save($localPath);
+
+        // Subir al FTP
+        $ftpPath = 'cuentas_cobro/' . $filename;
+        Storage::disk('ftp')->put($ftpPath, file_get_contents($localPath));
+
+        // (Opcional: guardar ruta en la base)
+        // $cuenta->pdf_path = $ftpPath;
+        // $cuenta->save();
+
+        return response()->download($localPath);
     }
 }

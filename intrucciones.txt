@@ -7,3 +7,8 @@
 3. despues pegar el repositorio clonado en el proyecto local
 
 4. configurar xammp buscar linea (Config Apache), y abrir el PHP(php.ini) y eliminar el punto y coma de la linea "extension=zip" despues guardar
+
+5. Despues de configurado el FTP, para configurar el descargue de archivos en la raiz del proyecto instalas desde cmd: composer require barryvdh/laravel-dompdf y despues composer require league/flysystem-ftp:^3
+
+
+

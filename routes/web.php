@@ -7,8 +7,10 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CuentaCobroController;
 use App\Http\Controllers\RolController;
 
+
 // Raíz
 Route::get('/', fn () => redirect('/login'));
+
 
 // Auth (públicas)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -59,7 +61,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cuenta-cobro/{cuenta}/ordenador', [CuentaCobroController::class, 'ordenadorDecision'])
         ->name('cuenta.cobro.ordenador')->middleware('role:ordenador_gasto');
 
-    // Cambio manual de estado (solo alcalde) ← NUEVA RUTA AGREGADA
+    // Exportar PDF (disponible para cualquier autenticado)
+    Route::post('/cuenta-cobro/{cuenta}/exportar-pdf', [CuentaCobroController::class, 'exportarCuentaPDF'])
+        ->name('cuenta.cobro.exportar.pdf')
+        ->middleware('auth');
+
+    // Cambio manual de estado (solo alcalde)
     Route::post('/cuenta-cobro/{cuenta}/cambiar-estado', [CuentaCobroController::class, 'cambiarEstado'])
         ->name('cuenta.cobro.cambiar.estado')
         ->middleware('role:alcalde');
