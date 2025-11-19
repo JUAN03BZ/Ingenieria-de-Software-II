@@ -1,0 +1,407 @@
+/* === DETALLE CUENTA DE COBRO - ESTILOS === */
+
+/* === CONTENEDOR PRINCIPAL === */
+.container {
+    max-width: 1000px;
+    background: linear-gradient(135deg, #2d3142, #3f4354);
+    border-radius: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding: 40px 35px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    color: #e2e8f0;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* === ENCABEZADO === */
+h2 {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-shadow: 2px 2px 4px rgba(185, 185, 185, 0.2);
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+/* === LISTA DE DETALLES === */
+.list-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.list-group-item {
+    background: rgba(30, 41, 59, 0.6);
+    border: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    padding: 16px 20px;
+    color: #dbdbdb;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.list-group-item:first-child {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.list-group-item:last-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-bottom: none;
+}
+
+.list-group-item strong {
+    color: #3b82f6;
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+/* === BADGES DE ESTADO === */
+.badge {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(213, 213, 213, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #1e293b !important;
+}
+
+.badge.bg-primary {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6) !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-info {
+    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
+    color: #ffffff !important;
+}
+
+.badge.bg-secondary {
+    background: linear-gradient(135deg, #64748b, #475569) !important;
+    color: #ffffff !important;
+}
+
+/* === BOTONES === */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    border: none;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #475569, #334155);
+    box-shadow: 0 6px 20px rgba(100, 116, 139, 0.5);
+    color: #ffffff;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #1e293b;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+    color: #1e293b;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    color: #ffffff;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    color: #ffffff;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    color: #ffffff;
+}
+
+.btn-outline-dark {
+    color: #e2e8f0;
+    border: 2px solid rgba(226, 232, 240, 0.3);
+    background: rgba(30, 41, 59, 0.3);
+}
+
+.btn-outline-dark:hover {
+    background: rgba(226, 232, 240, 0.2);
+    border-color: #e2e8f0;
+    color: #ffffff;
+}
+
+/* === CARDS === */
+.card {
+    background: linear-gradient(135deg, #2d3142, #3f4354);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: #ffffff;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 16px 16px 0 0 !important;
+    padding: 15px 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.card-header i {
+    color: #60a5fa;
+}
+
+.list-group-flush .list-group-item {
+    background: rgba(30, 41, 59, 0.6);
+    border-left: none;
+    border-right: none;
+}
+
+.list-group-flush .list-group-item:first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.list-group-flush .list-group-item:last-child {
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+.list-group-flush .list-group-item em {
+    color: #94a3b8;
+    font-style: italic;
+    display: block;
+    margin-top: 8px;
+}
+
+.list-group-flush .list-group-item small {
+    color: #64748b !important;
+}
+
+/* === FORMULARIOS === */
+.form-select,
+.form-control {
+    border-radius: 10px;
+    border: 2px solid rgba(100, 116, 139, 0.3);
+    background: #1e293b;
+    color: #e2e8f0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 0.95rem;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: #3b82f6;
+    background: #334155;
+    color: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-select option {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+.form-control::placeholder {
+    color: #64748b;
+}
+
+/* === ESPACIADO Y LAYOUT === */
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+.ms-2 {
+    margin-left: 0.5rem !important;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.d-inline {
+    display: inline;
+}
+
+.row {
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.row > * {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.g-2 {
+    gap: 0.5rem;
+}
+
+.col-auto {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+.col {
+    flex: 1 1 0;
+}
+
+/* === ICONOS === */
+.fas {
+    margin-right: 4px;
+}
+
+/* === TEXTO === */
+.text-muted {
+    color: #94a3b8 !important;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 20px;
+        margin-top: 20px;
+        border-radius: 16px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .list-group-item {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .d-flex.gap-2 {
+        flex-direction: column;
+        gap: 8px !important;
+    }
+
+    .row.g-2 {
+        flex-direction: column;
+    }
+
+    .col-auto,
+    .col {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .form-select,
+    .form-control {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding: 20px 15px;
+        margin-top: 15px;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    .list-group-item {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
