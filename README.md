@@ -48,3 +48,27 @@ El sistema utiliza políticas de acceso de Laravel para restringir acciones seg�
 - **Base de datos**: MySQL, estructurada para soportar trazabilidad y relaciones entre usuarios, documentos y transacciones.
 - **Interfaz**: Interfaces responsivas e intuitivas desarrolladas con los componentes de Laravel Blade.
 - **Despliegue**: Puede hacerse localmente o en servidor, utilizando herramientas como FileZilla para transferencias FTP.
+
+## 👥 Equipo de Desarrollo
+
+El éxito de este sistema fue posible gracias al trabajo colaborativo de un equipo multidisciplinario, donde cada integrante asumió responsabilidades específicas alineadas a su perfil y experiencia.
+
+### Roles y Responsabilidades
+
+- **Andrés Julián Canasto**  
+  _Desarrollador Back End_  
+  Encargado del diseño y la implementación de la lógica del servidor, gestión de la base de datos, definición de APIs y la integración con Laravel. Garantizó la robustez, seguridad y eficiencia de los procesos del núcleo del sistema.
+
+- **German Adolfo Bautista**  
+  _Desarrollador Front End_  
+  Responsable de la creación de las interfaces de usuario, construcción de vistas intuitivas y experiencia de usuario (UX). Implementó tecnologías web modernas y aportó al diseño responsivo y accesibilidad del sistema.
+
+- **Cristian Felipe Bolívar**  
+  _Reactor Técnico_  
+  Contribuyó como experto en análisis técnico, apoyando la definición de requerimientos, la elaboración de diagramas y modelos arquitectónicos. Validó propuestas de solución y supervisó el cumplimiento técnico de las especificaciones.
+
+- **Juan José Barrera**  
+  _Reactor Técnico_  
+  Participó activamente en la revisión técnica de documentación, así como en la estructuración y optimización de los flujos de desarrollo. Colaboró en la integración de herramientas y buenas prácticas en la ingeniería del software.
+
+> Cada miembro aportó desde su especialidad para asegurar un desarrollo de calidad, promoviendo el trabajo en equipo y el aprendizaje colaborativo.
